@@ -1,14 +1,7 @@
 import { encodeAbiParameters } from 'viem';
-import type { Address, Hex } from 'viem';
+import type { Hex } from 'viem';
 import type { PermitSingle } from '@gonzaotc/permit2-sdk-viem';
-
-export type PoolKey = {
-	currency0: Address;
-	currency1: Address;
-	fee: number;
-	tickSpacing: number;
-	hooks: Address;
-};
+import type { PoolKey } from './uniswapV4';
 
 export type PaymasterData = {
 	poolKey: PoolKey;

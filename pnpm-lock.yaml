@@ -20,10 +20,10 @@ importers:
 
   integration:
     dependencies:
-      '@uniswap-paymaster/contracts':
+      paymaster-contracts:
         specifier: workspace:*
         version: link:../contracts
-      '@uniswap-paymaster/sdk':
+      paymaster-sdk:
         specifier: workspace:*
         version: link:../sdk
     devDependencies:

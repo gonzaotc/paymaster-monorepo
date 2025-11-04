@@ -6,9 +6,9 @@ A pnpm workspace monorepo for UniswapPaymaster smart contracts, TypeScript SDK, 
 
 ```
 paymaster-monorepo/
-├── contracts/          @uniswap-paymaster/contracts (Foundry, publishable)
-├── sdk/                @uniswap-paymaster/sdk (TypeScript/Viem, publishable)
-└── integration/        @uniswap-paymaster/integration-tests (Hardhat, private)
+├── contracts/          paymaster-contracts (Foundry, publishable)
+├── sdk/                paymaster-sdk (TypeScript/Viem, publishable)
+└── integration/        paymaster-integration (Hardhat, private)
 ```
 
 ## Quick Start
@@ -30,12 +30,12 @@ pnpm build
 # Build
 pnpm build                  # All packages
 pnpm build:contracts        # forge build
-pnpm build:sdk             # tsc
+pnpm build:sdk              # tsc
 
 # Test
 pnpm test                   # All tests
-pnpm test:contracts        # Foundry tests (Solidity)
-pnpm test:integration      # Hardhat tests (TypeScript)
+pnpm test:contracts         # Foundry tests (Solidity)
+pnpm test:integration       # Hardhat tests (TypeScript)
 
 # Development
 pnpm dev:sdk               # Watch mode for SDK
@@ -97,10 +97,10 @@ pnpm test       # Builds contracts, generates ABIs, runs tests
 cd contracts && forge install OpenZeppelin/openzeppelin-contracts
 
 # npm dependency to SDK
-pnpm --filter @uniswap-paymaster/sdk add <package>
+pnpm --filter paymaster-sdk add <package>
 
 # npm dependency to integration
-pnpm --filter @uniswap-paymaster/integration-tests add -D <package>
+pnpm --filter paymaster-integration add -D <package>
 ```
 
 ## Publishing to npm
@@ -124,9 +124,9 @@ cd sdk && npm publish --access public
 ```
 External Apps/Wallets
         ↓
-    @uniswap-paymaster/sdk (imports ABIs from)
+    paymaster-sdk (imports ABIs from)
         ↓
-    @uniswap-paymaster/contracts
+    paymaster-contracts
         ↑
         │ (tested together by)
     integration/

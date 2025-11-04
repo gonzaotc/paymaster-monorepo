@@ -1,10 +1,11 @@
 import hre from 'hardhat';
-import { uniswapPaymasterAbi } from '../generated/abis';
+import { uniswapPaymasterAbi, poolManagerAbi, stateViewAbi } from '../generated/abis';
 import { loadForgeArtifact } from '../src/helpers';
-import { PERMIT2_ADDRESS, router, paymaster, permit2 } from '@uniswap-paymaster/sdk';
+import { router, paymaster, permit2, ADDRESS_ZERO, PoolKey, uniswapV4 } from 'paymaster-sdk';
 import {
 	type Call,
 	type Address,
+	type Hex,
 	createClient,
 	erc20Abi,
 	getContract,
@@ -14,25 +15,47 @@ import {
 	http,
 } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
-import { arbitrumSepolia } from 'viem/chains';
+import { sepolia } from 'viem/chains';
 import {
 	createBundlerClient,
 	BundlerClient,
 	toSimple7702SmartAccount,
 } from 'viem/account-abstraction';
+import { SQRT_PRICE_1_4000 } from '../src/constants';
+import { expect } from 'chai';
 
 describe('Integration Test', function () {
 	let paymasterAddress: Address;
 
-	const POOL_MANAGER_ADDRESS = '0xE03A1074c86CFeDd5C142C4F04F1a1536e203543';
-	const USDC_ADDRESS = '0x75faf114eafb1BDbe2F0316DF893fd58CE46AA4d';
+	const RPC_URL = process.env.RPC_URL_SEPOLIA as string;
+	const BUNDLER_URL = process.env.BUNDLER_URL_SEPOLIA as string;
 
-	const BUNDLER_URL = process.env.BUNDLER_URL;
-	const PRIVATE_KEY = process.env.PRIVATE_KEY;
-	const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS;
+	const ADDRESS = process.env.ADDRESS as Address;
+	const PRIVATE_KEY = process.env.PRIVATE_KEY as Hex;
+	const RECIPIENT_ADDRESS = process.env.RECIPIENT_ADDRESS as Address;
+
+	const POOL_MANAGER_ADDRESS = process.env.POOL_MANAGER_SEPOLIA as Address;
+	const PERMIT2_ADDRESS = process.env.PERMIT2_SEPOLIA as Address;
+	const USDC_ADDRESS = process.env.USDC_SEPOLIA as Address;
+	const STATE_VIEW_ADDRESS = process.env.STATE_VIEW_SEPOLIA as Address;
+
+	if (
+		!RPC_URL ||
+		!BUNDLER_URL ||
+		!ADDRESS ||
+		!PRIVATE_KEY ||
+		!RECIPIENT_ADDRESS ||
+		!POOL_MANAGER_ADDRESS ||
+		!STATE_VIEW_ADDRESS ||
+		!PERMIT2_ADDRESS ||
+		!USDC_ADDRESS
+	) {
+		throw new Error('Missing environment variables');
+	}
+
 	const USDC_TRANSFER_AMOUNT = parseUnits('10', 6); // 10 USDC
 
-	before(async function () {
+	before('deploy paymaster', async function () {
 		const [deployer] = await hre.viem.getWalletClients();
 		const publicClient = await hre.viem.getPublicClient();
 
@@ -49,17 +72,69 @@ describe('Integration Test', function () {
 		paymasterAddress = receipt.contractAddress!;
 	});
 
-	it('integration test', async function () {
-		if (!PRIVATE_KEY || !RECIPIENT_ADDRESS || !BUNDLER_URL) {
-			throw new Error('Missing environment variables');
-		}
+	before('create [ETH, USDC] pool', async function () {
+		const [deployer] = await hre.viem.getWalletClients();
+		const publicClient = await hre.viem.getPublicClient();
 
-		const eoa = privateKeyToAccount(PRIVATE_KEY as `0x${string}`);
+		const poolManager = getContract({
+			address: POOL_MANAGER_ADDRESS,
+			abi: poolManagerAbi,
+			client: { public: publicClient, wallet: deployer },
+		});
+
+		// verify that the pool manager contract is deployed
+        const poolManagerCode = await publicClient.getCode({
+            address: POOL_MANAGER_ADDRESS,
+        });
+		expect(poolManagerCode?.length).to.be.greaterThan(20);
+
+		const poolKey: PoolKey = {
+			currency0: ADDRESS_ZERO,
+			currency1: USDC_ADDRESS,
+			fee: 1000,
+			tickSpacing: 60,
+			hooks: ADDRESS_ZERO,
+		};
+
+		await poolManager.write.initialize([poolKey, SQRT_PRICE_1_4000]);
+
+		const stateView = getContract({
+			address: STATE_VIEW_ADDRESS,
+			abi: stateViewAbi,
+			client: { public: publicClient, wallet: deployer },
+		});
+
+		const poolId = uniswapV4.toId(poolKey);
+
+		// verify that the state view contract is deployed
+        const stateViewCode = await publicClient.getCode({
+            address: STATE_VIEW_ADDRESS,
+        });
+		expect(stateViewCode?.length).to.be.greaterThan(20);
+
+		const liquidity = await stateView.read.getLiquidity([poolId]);
+		console.log('liquidity', liquidity);
+	});
+
+	it('test initialized pool', async function () {
+		// const [deployer] = await hre.viem.getWalletClients();
+		// const publicClient = await hre.viem.getPublicClient();
+		// const poolManager = getContract({
+		// 	address: POOL_MANAGER_ADDRESS,
+		// 	abi: poolManagerAbi,
+		// 	client: { public: publicClient, wallet: deployer },
+		// });
+		// const poolKey = await poolManager.read.poolKey();
+		// console.log('pool key', poolKey);
+	});
+
+	it.skip('integration test', async function () {
+		const eoa = privateKeyToAccount(PRIVATE_KEY);
 		console.log('created eoa');
 
 		const client = createClient({
 			account: eoa,
-			chain: arbitrumSepolia,
+			chain: sepolia,
 			transport: http(),
 		})
 			.extend(publicActions)
@@ -87,7 +162,7 @@ describe('Integration Test', function () {
 			to: USDC_ADDRESS,
 			abi: erc20Abi,
 			functionName: 'transfer',
-			args: [RECIPIENT_ADDRESS as Address, USDC_TRANSFER_AMOUNT], // 10 USDC
+			args: [RECIPIENT_ADDRESS, USDC_TRANSFER_AMOUNT], // 10 USDC
 		};
 		console.log('created tx');
 

@@ -1,5 +1,5 @@
 import { Address } from 'viem';
-import type { PoolKey } from './paymaster';
+import type { PoolKey } from './uniswapV4';
 import { ADDRESS_ZERO } from './constants';
 
 export interface Router {

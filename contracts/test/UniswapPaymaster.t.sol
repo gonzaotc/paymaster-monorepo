@@ -24,6 +24,7 @@ import {ModifyLiquidityParams} from "@uniswap/v4-core/src/interfaces/IPoolManage
 import {LPFeeLibrary} from "@uniswap/v4-core/src/libraries/LPFeeLibrary.sol";
 import {Hooks} from "@uniswap/v4-core/src/libraries/Hooks.sol";
 import {Permit2} from "@uniswap/permit2/src/Permit2.sol";
+import {StateView} from "@uniswap/v4-periphery/src/lens/StateView.sol";
 // uniswap
 
 // Internal

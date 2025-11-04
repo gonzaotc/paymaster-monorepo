@@ -16,8 +16,8 @@
     "lint": "prettier --write test/ && eslint test/"
   },
   "dependencies": {
-    "@uniswap-paymaster/contracts": "workspace:*",
-    "@uniswap-paymaster/sdk": "workspace:*"
+    "paymaster-contracts": "workspace:*",
+    "paymaster-sdk": "workspace:*"
   },
   "overrides": {
     "viem": "$viem"

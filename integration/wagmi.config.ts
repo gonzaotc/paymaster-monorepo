@@ -11,6 +11,8 @@ export default defineConfig({
         "UniswapPaymaster.sol/**",
         "MinimalPaymasterCore.sol/**",
         "EntryPointVault.sol/**",
+        "PoolManager.sol/**",
+        "StateView.sol/**",
       ],
     }),
   ],

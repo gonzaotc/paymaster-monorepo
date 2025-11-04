@@ -11,19 +11,19 @@
     "integration"
   ],
   "scripts": {
-    "build": "pnpm -r --filter='!@uniswap-paymaster/integration-tests' build",
-    "build:contracts": "pnpm --filter @uniswap-paymaster/contracts build",
-    "build:sdk": "pnpm --filter @uniswap-paymaster/sdk build",
+    "build": "pnpm -r --filter='!paymaster-integration' build",
+    "build:contracts": "pnpm --filter paymaster-contracts build",
+    "build:sdk": "pnpm --filter paymaster-sdk build",
     "test": "pnpm -r test",
-    "test:contracts": "pnpm --filter @uniswap-paymaster/contracts test",
-    "test:sdk": "pnpm --filter @uniswap-paymaster/sdk test",
-    "test:integration": "pnpm --filter @uniswap-paymaster/integration-tests test",
+    "test:contracts": "pnpm --filter paymaster-contracts test",
+    "test:sdk": "pnpm --filter paymaster-sdk test",
+    "test:integration": "pnpm --filter paymaster-integration test",
     "lint": "pnpm -r lint",
-    "lint:contracts": "pnpm --filter @uniswap-paymaster/contracts lint",
-    "lint:sdk": "pnpm --filter @uniswap-paymaster/sdk lint",
-    "lint:integration": "pnpm --filter @uniswap-paymaster/integration-tests lint",
+    "lint:contracts": "pnpm --filter paymaster-contracts lint",
+    "lint:sdk": "pnpm --filter paymaster-sdk lint",
+    "lint:integration": "pnpm --filter paymaster-integration lint",
     "clean": "pnpm -r clean",
-    "dev:sdk": "pnpm --filter @uniswap-paymaster/sdk dev"
+    "dev:sdk": "pnpm --filter paymaster-sdk dev"
   },
   "devDependencies": {
     "prettier": "^3.6.2"

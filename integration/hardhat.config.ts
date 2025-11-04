@@ -1,6 +1,11 @@
 import type { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox-viem";
 import "@nomicfoundation/hardhat-viem";
+import { config as dotenvConfig } from "dotenv";
+import { resolve } from "path";
+
+// Load environment variables from .env file
+dotenvConfig({ path: resolve(__dirname, ".env") });
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -22,12 +27,18 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-      chainId: 31337,
+      chainId: 11155111,
       allowUnlimitedContractSize: true,
+      forking: {
+        url: process.env.RPC_URL_SEPOLIA || "",
+        enabled: true,
+      },
     },
-  },
-  mocha: {
-    loader: 'tsx',
+    sepolia: {
+      url: process.env.RPC_URL_SEPOLIA || "",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 11155111,
+    },
   },
 };
 
