@@ -1,0 +1,23 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Solidity files
+*.sol text eol=lf
+
+# TypeScript/JavaScript
+*.ts text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+
+# Lock files should not be modified by git
+pnpm-lock.yaml text eol=lf -diff
+package-lock.json -diff
+yarn.lock -diff
+
+# Shell scripts
+*.sh text eol=lf
+
+# Markdown
+*.md text eol=lf
+
+

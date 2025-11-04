@@ -1,0 +1,37 @@
+{
+  "name": "@uniswap-paymaster/monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "UniswapPaymaster monorepo - smart contracts, SDK, and integration tests",
+  "license": "MIT",
+  "author": "gonzaotc",
+  "workspaces": [
+    "contracts",
+    "sdk",
+    "integration"
+  ],
+  "scripts": {
+    "build": "pnpm -r --filter='!@uniswap-paymaster/integration-tests' build",
+    "build:contracts": "pnpm --filter @uniswap-paymaster/contracts build",
+    "build:sdk": "pnpm --filter @uniswap-paymaster/sdk build",
+    "test": "pnpm -r test",
+    "test:contracts": "pnpm --filter @uniswap-paymaster/contracts test",
+    "test:sdk": "pnpm --filter @uniswap-paymaster/sdk test",
+    "test:integration": "pnpm --filter @uniswap-paymaster/integration-tests test",
+    "lint": "pnpm -r lint",
+    "lint:contracts": "pnpm --filter @uniswap-paymaster/contracts lint",
+    "lint:sdk": "pnpm --filter @uniswap-paymaster/sdk lint",
+    "lint:integration": "pnpm --filter @uniswap-paymaster/integration-tests lint",
+    "clean": "pnpm -r clean",
+    "dev:sdk": "pnpm --filter @uniswap-paymaster/sdk dev"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "packageManager": "pnpm@10.17.1+sha512.17c560fca4867ae9473a3899ad84a88334914f379be46d455cbf92e5cf4b39d34985d452d2583baf19967fa76cb5c17bc9e245529d0b98745721aa7200ecaf7a"
+}
+

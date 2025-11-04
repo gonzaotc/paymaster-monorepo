@@ -1,0 +1,9 @@
+packages:
+  - contracts
+  - sdk
+  - integration
+
+onlyBuiltDependencies:
+  - esbuild
+  - keccak
+  - secp256k1
