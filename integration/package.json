@@ -1,0 +1,46 @@
+{
+  "name": "@uniswap-paymaster/integration-tests",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Integration tests for UniswapPaymaster",
+  "license": "MIT",
+  "author": "gonzaotc",
+  "scripts": {
+    "prebuild": "cd ../contracts && forge build",
+    "generate": "wagmi generate",
+    "test": "npm run prebuild && npm run generate && NODE_OPTIONS='--import tsx' hardhat test",
+    "test:watch": "hardhat watch test",
+    "compile": "hardhat compile",
+    "clean": "hardhat clean && cd ../contracts && forge clean",
+    "node": "hardhat node",
+    "lint": "prettier --write test/ && eslint test/"
+  },
+  "dependencies": {
+    "@uniswap-paymaster/contracts": "workspace:*",
+    "@uniswap-paymaster/sdk": "workspace:*"
+  },
+  "overrides": {
+    "viem": "$viem"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
+    "@nomicfoundation/hardhat-viem": "^2.0.0",
+    "@types/chai": "^4.3.0",
+    "@types/mocha": "^10.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "@wagmi/cli": "^2.1.0",
+    "chai": "^4.3.0",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "hardhat": "^2.22.0",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.0",
+    "tsx": "^4.20.6",
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.46.2",
+    "viem": "^2.38.5"
+  }
+}

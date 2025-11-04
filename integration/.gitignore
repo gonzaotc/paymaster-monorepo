@@ -1,0 +1,16 @@
+# Hardhat
+cache/
+artifacts/
+typechain-types/
+
+node_modules/
+
+# Generated types
+test/generated.ts
+
+# Test coverage
+coverage/
+coverage.json
+
+# Environment variables
+.env

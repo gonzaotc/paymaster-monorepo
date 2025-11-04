@@ -1,0 +1,5 @@
+@eth-infinitism/account-abstraction/=lib/account-abstraction/
+@openzeppelin/contracts/=lib/openzeppelin-contracts/contracts/
+@openzeppelin/uniswap-hooks=lib/uniswap-hooks/
+@uniswap/v4-core=lib/v4-core/
+@uniswap/permit2=lib/permit2/

@@ -1,0 +1,55 @@
+{
+  "name": "@uniswap-paymaster/sdk",
+  "version": "0.1.0",
+  "description": "SDK for interacting with UniswapPaymaster - pay for transactions with any token via Uniswap V4",
+  "keywords": [
+    "ethereum",
+    "erc4337",
+    "account-abstraction",
+    "paymaster",
+    "uniswap",
+    "permit2",
+    "gasless"
+  ],
+  "license": "MIT",
+  "author": "gonzaotc",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "echo 'No unit tests yet - use integration tests'",
+    "lint": "prettier --write src/ test/ && eslint src/ test/",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+	"peerDependencies": {
+		"viem": "^2.0.0"
+	},
+	"dependencies": {
+		"@gonzaotc/permit2-sdk-viem": "^0.0.0",
+		"@uniswap/permit2-sdk": "^1.4.0"
+	},
+  "devDependencies": {
+    "@eslint/js": "^9.38.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.46.2"
+  }
+}

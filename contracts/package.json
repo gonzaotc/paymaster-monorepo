@@ -1,0 +1,24 @@
+{
+  "name": "@uniswap-paymaster/contracts",
+  "version": "0.1.0",
+  "description": "Smart contracts for UniswapPaymaster - pay for transactions with any token via Uniswap V4",
+  "license": "MIT",
+  "author": "gonzaotc",
+  "type": "module",
+  "files": [
+    "src",
+    "out",
+    "foundry.toml",
+    "remappings.txt"
+  ],
+  "scripts": {
+    "build": "forge build",
+    "test": "forge test",
+    "lint": "forge fmt --check && solhint 'src/**/*.sol' --noPoster",
+    "lint:fix": "forge fmt",
+    "clean": "forge clean"
+  },
+  "dependencies": {
+    "solhint": "^6.0.0"
+  }
+}
