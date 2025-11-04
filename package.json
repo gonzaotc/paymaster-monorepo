@@ -1,5 +1,5 @@
 {
-  "name": "@uniswap-paymaster/monorepo",
+  "name": "paymaster-monorepo",
   "version": "0.1.0",
   "private": true,
   "description": "UniswapPaymaster monorepo - smart contracts, SDK, and integration tests",

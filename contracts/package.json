@@ -1,5 +1,5 @@
 {
-  "name": "@uniswap-paymaster/contracts",
+  "name": "paymaster-contracts",
   "version": "0.1.0",
   "description": "Smart contracts for UniswapPaymaster - pay for transactions with any token via Uniswap V4",
   "license": "MIT",

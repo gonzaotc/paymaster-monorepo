@@ -1,5 +1,5 @@
 {
-  "name": "@uniswap-paymaster/integration-tests",
+  "name": "paymaster-integration",
   "version": "0.1.0",
   "private": true,
   "description": "Integration tests for UniswapPaymaster",

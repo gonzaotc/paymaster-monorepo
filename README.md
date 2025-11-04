@@ -11,8 +11,6 @@ paymaster-monorepo/
 └── integration/        @uniswap-paymaster/integration-tests (Hardhat, private)
 ```
 
-**Dependency flow:** `integration` → `contracts` + `sdk` (both independent)
-
 ## Quick Start
 
 ```bash
@@ -132,43 +130,4 @@ External Apps/Wallets
         ↑
         │ (tested together by)
     integration/
-```
-
-## Key Design Points
-
-### Foundry + Hardhat coexistence
-They don't conflict:
-- **Foundry**: `contracts/lib/` (git submodules) + `forge` commands
-- **Hardhat**: `integration/node_modules/` (npm packages) + `hardhat` commands
-- Different directories, different dependency systems, no overlap
-
-### Git submodules in subdirectory
-`contracts/.gitmodules` is perfectly fine in a subdirectory. This is standard Foundry practice. Git submodules are isolated from npm packages and won't interfere with the monorepo.
-
-## Troubleshooting
-
-**"Cannot find module '@uniswap-paymaster/contracts'"**  
-→ Run `pnpm install` at root to set up workspace links
-
-**"forge: command not found"**  
-→ Install Foundry: `curl -L https://foundry.paradigm.xyz | bash && foundryup`
-
-**"Git submodules are empty"**  
-→ Run `cd contracts && forge install`
-
-**Integration tests fail**  
-→ Build contracts first: `pnpm build:contracts`
-
-## CI/CD Example
-
-```yaml
-- uses: actions/setup-node@v4
-  with:
-    node-version: '20'
-- run: npm install -g pnpm
-- uses: foundry-rs/foundry-toolchain@v1
-- run: pnpm install
-- run: cd contracts && forge install
-- run: pnpm build
-- run: pnpm test
 ```
