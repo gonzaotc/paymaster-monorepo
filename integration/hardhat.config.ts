@@ -3,9 +3,14 @@ import "@nomicfoundation/hardhat-toolbox-viem";
 import "@nomicfoundation/hardhat-viem";
 import { config as dotenvConfig } from "dotenv";
 import { resolve } from "path";
+import { Chain } from "./src/config";
+import { getChainConfig } from "./src/config";
 
 // Load environment variables from .env file
 dotenvConfig({ path: resolve(__dirname, ".env") });
+
+export const selectedChain: Chain = 'mainnet';
+export const chainConfig = getChainConfig(selectedChain);
 
 const config: HardhatUserConfig = {
   solidity: {
@@ -30,7 +35,7 @@ const config: HardhatUserConfig = {
       chainId: 11155111,
       allowUnlimitedContractSize: true,
       forking: {
-        url: process.env.RPC_URL_SEPOLIA || "",
+        url: chainConfig.RPC_URL,
         enabled: true,
       },
     },
@@ -38,6 +43,11 @@ const config: HardhatUserConfig = {
       url: process.env.RPC_URL_SEPOLIA || "",
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: 11155111,
+    },
+    mainnet: {
+      url: process.env.RPC_URL_MAINNET || "",
+      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      chainId: 1,
     },
   },
 };
