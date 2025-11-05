@@ -12,15 +12,8 @@ async function main() {
 	const [deployer] = await hre.viem.getWalletClients();
 	const publicClient = await hre.viem.getPublicClient();
 
-	console.log(`Deploying UniswapPaymaster to ${chainConfig.name}...`);
-	console.log(`Deployer address: ${deployer.account.address}`);
-	console.log(`Pool Manager: ${chainConfig.POOL_MANAGER}`);
-	console.log(`Permit2: ${chainConfig.PERMIT2}`);
-
-	// Load the bytecode from Forge artifacts
 	const { bytecode } = loadForgeArtifact('UniswapPaymaster');
 
-	// Deploy the contract
 	const hash = await deployer.deployContract({
 		abi: uniswapPaymasterAbi,
 		bytecode,

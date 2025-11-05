@@ -14,7 +14,8 @@
     "clean": "hardhat clean && cd ../contracts && forge clean",
     "node": "hardhat node",
     "lint": "prettier --write test/ && eslint test/",
-    "deploy-paymaster": "hardhat run scripts/deployPaymaster.ts"
+    "deploy-paymaster": "hardhat run scripts/deployPaymaster.ts",
+    "send-user-op": "hardhat run scripts/sendUserOp.ts"
   },
   "dependencies": {
     "paymaster-contracts": "workspace:*",

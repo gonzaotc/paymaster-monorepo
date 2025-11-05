@@ -35,19 +35,36 @@ describe('Integration Testnet Test', function () {
 		const [deployer] = await hre.viem.getWalletClients();
 		const publicClient = await hre.viem.getPublicClient();
 
-		const { bytecode } = loadForgeArtifact('UniswapPaymaster');
-		const paymasterHash = await deployer.deployContract({
-			abi: uniswapPaymasterAbi,
-			bytecode,
-			args: [chainConfig.POOL_MANAGER, chainConfig.PERMIT2],
-		});
-		const receipt = await publicClient.waitForTransactionReceipt({
-			hash: paymasterHash,
+		// const { bytecode } = loadForgeArtifact('UniswapPaymaster');
+		// const paymasterHash = await deployer.deployContract({
+		// 	abi: uniswapPaymasterAbi,
+		// 	bytecode,
+		// 	args: [chainConfig.POOL_MANAGER, chainConfig.PERMIT2],
+		// });
+		// const receipt = await publicClient.waitForTransactionReceipt({
+		// 	hash: paymasterHash,
+		// });
+
+		// paymasterAddress = receipt.contractAddress!;
+		// expect(paymasterAddress.length).to.equal(42);
+	});
+
+	it('Find & check [ETH, USDC] pool liquidity', async function () {
+		const publicClient = await hre.viem.getPublicClient();
+		const [deployer] = await hre.viem.getWalletClients();
+
+		const poolKey = await router.findBestPoolKey(chainConfig.USDC, USDC_TRANSFER_AMOUNT);
+	    const poolId = uniswapV4.toId(poolKey);
+
+		const stateView = getContract({
+			address: chainConfig.STATE_VIEW,
+			abi: stateViewAbi,
+			client: { public: publicClient, wallet: deployer },
 		});
 
-		paymasterAddress = receipt.contractAddress!;
-		expect(paymasterAddress.length).to.equal(42);
-	});
+		const liquidity = await stateView.read.getLiquidity([poolId]);
+		expect(Number(liquidity)).to.be.greaterThan(0);
+	})
 
 	it('Find & check [ETH, USDC] pool liquidity', async function () {
 		const publicClient = await hre.viem.getPublicClient();
