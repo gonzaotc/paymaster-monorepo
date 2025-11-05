@@ -7,8 +7,9 @@
  * @module uniswap-paymaster-sdk
  */
 
-export * from './constants';
-export * from './permit2';
-export * from './paymaster';
-export * from './router';
-export * from './uniswapV4';
+export * from './constants.js';
+export * from './permit2.js';
+export * from './paymaster.js';
+export * from './router.js';
+export * from './uniswapV4.js';
+export * from './generated/abis.js';

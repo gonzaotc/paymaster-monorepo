@@ -28,20 +28,24 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc",
+    "generate": "wagmi generate",
+    "build": "cd ../contracts && forge build && cd ../sdk && npm run generate && tsc",
     "dev": "tsc --watch",
-    "test": "echo 'No unit tests yet - use integration tests'",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "prettier --write src/ test/ && eslint src/ test/",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist"
   },
-	"peerDependencies": {
-		"viem": "^2.0.0"
-	},
-	"dependencies": {
-		"@gonzaotc/permit2-sdk-viem": "^0.0.0",
-		"@uniswap/permit2-sdk": "^1.4.0"
-	},
+  "peerDependencies": {
+    "viem": "^2.0.0"
+  },
+  "dependencies": {
+    "@gonzaotc/permit2-sdk-viem": "^0.0.0",
+    "@uniswap/permit2-sdk": "^1.4.0",
+    "@wagmi/cli": "^2.7.1",
+    "dotenv": "^17.2.3"
+  },
   "devDependencies": {
     "@eslint/js": "^9.38.0",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
@@ -50,6 +54,7 @@
     "eslint-config-prettier": "^10.1.8",
     "prettier": "^3.6.2",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.46.2"
+    "typescript-eslint": "^8.46.2",
+    "vitest": "^2.0.0"
   }
 }

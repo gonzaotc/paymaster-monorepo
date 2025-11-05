@@ -8,7 +8,7 @@ import { getChainConfig } from "./src/config";
 // Load environment variables from .env file
 dotenvConfig({ path: resolve(__dirname, ".env") });
 
-export const selectedChain: string = 'sepolia';
+export const selectedChain: string = 'unichainSepolia';
 export const chainConfig = getChainConfig(selectedChain);
 
 const config: HardhatUserConfig = {
@@ -42,6 +42,11 @@ const config: HardhatUserConfig = {
       url: process.env.RPC_URL_SEPOLIA || "",
       accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 11155111,
+    },
+    unichainSepolia: {
+      url: process.env.RPC_URL_UNICHAIN_SEPOLIA || "",
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
+      chainId: 1301,
     },
     mainnet: {
       url: process.env.RPC_URL_MAINNET || "",

@@ -27,3 +27,9 @@ export const ADDRESS_ZERO: Address = '0x0000000000000000000000000000000000000000
  * Universal Paymaster address
  */
 export const PAYMASTER_ADDRESS: Address = '0x3BA9A96eE3eFf3A69E2B18886AcF52027EFF8966';
+
+/**
+ * USDC token address on Sepolia testnet
+ * Source: https://github.com/Uniswap/v4-periphery
+ */
+export const USDC_ADDRESS: Address = '0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238';

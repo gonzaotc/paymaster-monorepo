@@ -14,7 +14,8 @@
     "node": "hardhat node",
     "lint": "prettier --write test/ && eslint test/",
     "deploy-paymaster": "hardhat run scripts/deployPaymaster.ts",
-    "send-user-op": "hardhat run scripts/sendUserOp.ts"
+    "send-user-op": "hardhat run scripts/sendUserOp.ts",
+    "send-sponsored-user-op": "hardhat run scripts/sendSponsoredUserOp.ts"
   },
   "dependencies": {
     "paymaster-contracts": "workspace:*",

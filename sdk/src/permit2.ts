@@ -1,6 +1,6 @@
 import { Address, LocalAccount, Hex, WalletClient, Account } from 'viem';
 import { AllowanceTransfer, type PermitSingle } from '@gonzaotc/permit2-sdk-viem';
-import { PERMIT2_ADDRESS } from './constants';
+import { PERMIT2_ADDRESS } from './constants.js';
 
 interface Permit2 {
 	/**

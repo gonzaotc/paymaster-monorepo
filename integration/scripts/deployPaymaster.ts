@@ -1,5 +1,6 @@
 import hre from 'hardhat';
-import { uniswapPaymasterAbi, getChainConfig } from 'paymaster-sdk';
+import { uniswapPaymasterAbi } from 'paymaster-sdk';
+import { getChainConfig } from '../src/config';
 import { loadForgeArtifact } from '../src/helpers';
 import { selectedChain } from '../hardhat.config';
 

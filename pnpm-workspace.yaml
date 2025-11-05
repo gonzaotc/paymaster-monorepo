@@ -7,3 +7,7 @@ onlyBuiltDependencies:
   - esbuild
   - keccak
   - secp256k1
+
+# Temporarily commented out - patch file is missing
+# patchedDependencies:
+#   '@gonzaotc/permit2-sdk-viem@0.0.0': patches/@gonzaotc__permit2-sdk-viem@0.0.0.patch

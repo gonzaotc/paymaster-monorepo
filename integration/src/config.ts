@@ -22,7 +22,6 @@ export type ChainConfig = {
     PERMIT2: Address;
     //
     USDC: Address;
-    USDC_WHALE: Address;
     // 
     USER_PRIVATE_KEY: Hex;
     USER_ADDRESS: Address;
@@ -51,8 +50,30 @@ export const chainConfig: Record<string, ChainConfig> = {
         PERMIT2: process.env.PERMIT2_SEPOLIA as unknown as Address,
         //
         USDC: process.env.USDC_SEPOLIA as unknown as Address,
-        USDC_WHALE: process.env.USDC_WHALE_SEPOLIA as unknown as Address,
         // 
+        USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
+        USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
+        //
+        DEPLOYER_PRIVATE_KEY: process.env.DEPLOYER_PRIVATE_KEY as unknown as Hex,
+        DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS as unknown as Address,
+        //
+        RECIPIENT_ADDRESS: process.env.RECIPIENT_ADDRESS as unknown as Address,
+    },
+    unichainSepolia: {
+        id: 1301,
+        name: 'Unichain Sepolia',
+        //
+        RPC_URL: process.env.RPC_URL_UNICHAIN_SEPOLIA as string,
+        BUNDLER_URL: process.env.BUNDLER_URL_UNICHAIN_SEPOLIA as string,
+        //
+        PAYMASTER: process.env.PAYMASTER_UNICHAIN_SEPOLIA as unknown as Address,
+        //
+        POOL_MANAGER: process.env.POOL_MANAGER_UNICHAIN_SEPOLIA as unknown as Address,
+        STATE_VIEW: process.env.STATE_VIEW_UNICHAIN_SEPOLIA as unknown as Address,
+        PERMIT2: process.env.PERMIT2_UNICHAIN_SEPOLIA as unknown as Address,
+        //
+        USDC: process.env.USDC_UNICHAIN_SEPOLIA as unknown as Address,
+        //
         USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
         USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
         //
@@ -75,7 +96,6 @@ export const chainConfig: Record<string, ChainConfig> = {
         PERMIT2: process.env.PERMIT2_MAINNET as unknown as Address,
         //
         USDC: process.env.USDC_MAINNET as unknown as Address,
-        USDC_WHALE: process.env.USDC_WHALE_MAINNET as unknown as Address,
         //
         USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
         USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
@@ -111,7 +131,6 @@ export const getChainConfig = (chain: string): ChainConfig => {
         STATE_VIEW: `STATE_VIEW_${chainSuffix}`,
         PERMIT2: `PERMIT2_${chainSuffix}`,
         USDC: `USDC_${chainSuffix}`,
-        USDC_WHALE: `USDC_WHALE_${chainSuffix}`,
         USER_PRIVATE_KEY: 'USER_PRIVATE_KEY',
         USER_ADDRESS: 'USER_ADDRESS',
         DEPLOYER_PRIVATE_KEY: 'DEPLOYER_PRIVATE_KEY',
