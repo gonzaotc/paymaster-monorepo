@@ -3,13 +3,12 @@ import "@nomicfoundation/hardhat-toolbox-viem";
 import "@nomicfoundation/hardhat-viem";
 import { config as dotenvConfig } from "dotenv";
 import { resolve } from "path";
-import { Chain } from "./src/config";
 import { getChainConfig } from "./src/config";
 
 // Load environment variables from .env file
 dotenvConfig({ path: resolve(__dirname, ".env") });
 
-export const selectedChain: Chain = 'sepolia';
+export const selectedChain: string = 'sepolia';
 export const chainConfig = getChainConfig(selectedChain);
 
 const config: HardhatUserConfig = {

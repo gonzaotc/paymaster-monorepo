@@ -63,7 +63,7 @@ async function main() {
 
 	const hash = await bundlerClient.sendUserOperation({
 		account,
-		...(authorization && { authorization }),
+		authorization,
 		calls: [tx],
 	});
 	console.log('sent user operation');

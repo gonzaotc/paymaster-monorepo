@@ -6,11 +6,6 @@ import { resolve } from "path";
 dotenvConfig({ path: resolve(__dirname, "../.env") });
 
 /**
- * Chain type
- */
-export type Chain = 'sepolia' | 'mainnet';
-
-/**
  * Chain configuration
  */
 export type ChainConfig = {
@@ -19,6 +14,8 @@ export type ChainConfig = {
     // 
     RPC_URL: string;
     BUNDLER_URL: string;
+    //
+    PAYMASTER: Address;
     //
     POOL_MANAGER: Address;
     STATE_VIEW: Address;
@@ -39,13 +36,15 @@ export type ChainConfig = {
 /**
  * Chain configuration map
  */
-export const chainConfig: Record<Chain, ChainConfig> = {
+export const chainConfig: Record<string, ChainConfig> = {
     sepolia: {
         id: 11155111,
         name: 'Sepolia',
         //
         RPC_URL: process.env.RPC_URL_SEPOLIA as string,
         BUNDLER_URL: process.env.BUNDLER_URL_SEPOLIA as string,
+        //
+        PAYMASTER: process.env.PAYMASTER_SEPOLIA as unknown as Address,
         //
         POOL_MANAGER: process.env.POOL_MANAGER_SEPOLIA as unknown as Address,
         STATE_VIEW: process.env.STATE_VIEW_SEPOLIA as unknown as Address,
@@ -69,6 +68,8 @@ export const chainConfig: Record<Chain, ChainConfig> = {
         RPC_URL: process.env.RPC_URL_MAINNET as string,
         BUNDLER_URL: process.env.BUNDLER_URL_MAINNET as string,
         //
+        PAYMASTER: process.env.PAYMASTER_MAINNET as unknown as Address,
+        //
         POOL_MANAGER: process.env.POOL_MANAGER_MAINNET as unknown as Address,
         STATE_VIEW: process.env.STATE_VIEW_MAINNET as unknown as Address,
         PERMIT2: process.env.PERMIT2_MAINNET as unknown as Address,
@@ -91,9 +92,9 @@ export const chainConfig: Record<Chain, ChainConfig> = {
  * @param chain - The chain to get the configuration for
  * @returns The chain configuration
  */
-export const getChainConfig = (chain: Chain): ChainConfig => {
+export const getChainConfig = (chain: string): ChainConfig => {
     if (!chainConfig[chain]) {
-        throw new Error(`Chain ${chain} not found`);
+        throw new Error(`Chain ${chain} not configured`);
     }
     
     const config = chainConfig[chain];
@@ -105,6 +106,7 @@ export const getChainConfig = (chain: Chain): ChainConfig => {
         name: null, // not an env var
         RPC_URL: `RPC_URL_${chainSuffix}`,
         BUNDLER_URL: `BUNDLER_URL_${chainSuffix}`,
+        PAYMASTER: `PAYMASTER_${chainSuffix}`,
         POOL_MANAGER: `POOL_MANAGER_${chainSuffix}`,
         STATE_VIEW: `STATE_VIEW_${chainSuffix}`,
         PERMIT2: `PERMIT2_${chainSuffix}`,
