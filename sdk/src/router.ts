@@ -9,16 +9,16 @@ export interface Router {
 	 * @param amount - The amount to find the best pool for.
 	 * @returns The best pool for the given token and amount.
 	 */
-	findBestPool(token: Address, amount: bigint): Promise<PoolKey>;
+	findBestPoolKey(token: Address, amount: bigint): Promise<PoolKey>;
 }
 
 export const router: Router = {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	async findBestPool(token: Address, amount: bigint): Promise<PoolKey> {
+	async findBestPoolKey(token: Address, amount: bigint): Promise<PoolKey> {
 		const bestPoolMock: PoolKey = {
 			currency0: ADDRESS_ZERO,
 			currency1: token,
-			fee: 1000,
+			fee: 3000,
 			tickSpacing: 60,
 			hooks: ADDRESS_ZERO,
 		};

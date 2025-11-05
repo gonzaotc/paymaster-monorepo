@@ -27,8 +27,12 @@ export type ChainConfig = {
     USDC: Address;
     USDC_WHALE: Address;
     // 
-    PRIVATE_KEY: Hex;
-    ADDRESS: Address;
+    USER_PRIVATE_KEY: Hex;
+    USER_ADDRESS: Address;
+    //
+    DEPLOYER_PRIVATE_KEY: Hex;
+    DEPLOYER_ADDRESS: Address;
+    //
     RECIPIENT_ADDRESS: Address;
 }
 
@@ -50,8 +54,12 @@ export const chainConfig: Record<Chain, ChainConfig> = {
         USDC: process.env.USDC_SEPOLIA as unknown as Address,
         USDC_WHALE: process.env.USDC_WHALE_SEPOLIA as unknown as Address,
         // 
-        PRIVATE_KEY: process.env.PRIVATE_KEY as unknown as Hex,
-        ADDRESS: process.env.ADDRESS as unknown as Address,
+        USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
+        USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
+        //
+        DEPLOYER_PRIVATE_KEY: process.env.DEPLOYER_PRIVATE_KEY as unknown as Hex,
+        DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS as unknown as Address,
+        //
         RECIPIENT_ADDRESS: process.env.RECIPIENT_ADDRESS as unknown as Address,
     },
     mainnet: {
@@ -68,8 +76,12 @@ export const chainConfig: Record<Chain, ChainConfig> = {
         USDC: process.env.USDC_MAINNET as unknown as Address,
         USDC_WHALE: process.env.USDC_WHALE_MAINNET as unknown as Address,
         //
-        PRIVATE_KEY: process.env.PRIVATE_KEY as unknown as Hex,
-        ADDRESS: process.env.ADDRESS as unknown as Address,
+        USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
+        USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
+        //
+        DEPLOYER_PRIVATE_KEY: process.env.DEPLOYER_PRIVATE_KEY as unknown as Hex,
+        DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS as unknown as Address,
+        //
         RECIPIENT_ADDRESS: process.env.RECIPIENT_ADDRESS as unknown as Address,
     },
 }
@@ -83,23 +95,41 @@ export const getChainConfig = (chain: Chain): ChainConfig => {
     if (!chainConfig[chain]) {
         throw new Error(`Chain ${chain} not found`);
     }
+    
     const config = chainConfig[chain];
-    if (
-            !config.RPC_URL ||
-            !config.BUNDLER_URL ||
-            // 
-            !config.POOL_MANAGER ||
-            !config.STATE_VIEW ||
-            !config.PERMIT2 ||
-            // 
-            !config.USDC ||
-            !config.USDC_WHALE ||
-            //
-            !config.ADDRESS ||
-            !config.PRIVATE_KEY ||
-            !config.RECIPIENT_ADDRESS
-        ) {
-            throw new Error('Missing environment variables');
+    const chainSuffix = chain.toUpperCase();
+    
+    // Map of config keys to their corresponding env variable names
+    const requiredVars: Record<keyof ChainConfig, string | null> = {
+        id: null, // not an env var
+        name: null, // not an env var
+        RPC_URL: `RPC_URL_${chainSuffix}`,
+        BUNDLER_URL: `BUNDLER_URL_${chainSuffix}`,
+        POOL_MANAGER: `POOL_MANAGER_${chainSuffix}`,
+        STATE_VIEW: `STATE_VIEW_${chainSuffix}`,
+        PERMIT2: `PERMIT2_${chainSuffix}`,
+        USDC: `USDC_${chainSuffix}`,
+        USDC_WHALE: `USDC_WHALE_${chainSuffix}`,
+        USER_PRIVATE_KEY: 'USER_PRIVATE_KEY',
+        USER_ADDRESS: 'USER_ADDRESS',
+        DEPLOYER_PRIVATE_KEY: 'DEPLOYER_PRIVATE_KEY',
+        DEPLOYER_ADDRESS: 'DEPLOYER_ADDRESS',
+        RECIPIENT_ADDRESS: 'RECIPIENT_ADDRESS',
+    };
+    
+    const missingVars: string[] = [];
+    
+    for (const [key, envVar] of Object.entries(requiredVars)) {
+        if (envVar && !config[key as keyof ChainConfig]) {
+            missingVars.push(envVar);
         }
+    }
+    
+    if (missingVars.length > 0) {
+        throw new Error(
+            `Missing environment variables for ${chain}:\n  - ${missingVars.join('\n  - ')}`
+        );
+    }
+    
     return config;
 }

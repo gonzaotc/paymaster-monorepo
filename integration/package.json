@@ -13,7 +13,8 @@
     "compile": "hardhat compile",
     "clean": "hardhat clean && cd ../contracts && forge clean",
     "node": "hardhat node",
-    "lint": "prettier --write test/ && eslint test/"
+    "lint": "prettier --write test/ && eslint test/",
+    "deploy-paymaster": "hardhat run scripts/deployPaymaster.ts"
   },
   "dependencies": {
     "paymaster-contracts": "workspace:*",

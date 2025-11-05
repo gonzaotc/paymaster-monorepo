@@ -9,7 +9,7 @@ import { getChainConfig } from "./src/config";
 // Load environment variables from .env file
 dotenvConfig({ path: resolve(__dirname, ".env") });
 
-export const selectedChain: Chain = 'mainnet';
+export const selectedChain: Chain = 'sepolia';
 export const chainConfig = getChainConfig(selectedChain);
 
 const config: HardhatUserConfig = {
@@ -36,17 +36,17 @@ const config: HardhatUserConfig = {
       allowUnlimitedContractSize: true,
       forking: {
         url: chainConfig.RPC_URL,
-        enabled: true,
+        enabled: false,
       },
     },
     sepolia: {
       url: process.env.RPC_URL_SEPOLIA || "",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 11155111,
     },
     mainnet: {
       url: process.env.RPC_URL_MAINNET || "",
-      accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
+      accounts: process.env.DEPLOYER_PRIVATE_KEY ? [process.env.DEPLOYER_PRIVATE_KEY] : [],
       chainId: 1,
     },
   },

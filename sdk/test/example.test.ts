@@ -70,7 +70,7 @@
 // 	}
 
 // 	// find the best pool to use
-// 	const bestPoolKey = await router.findBestPool(USDC_ADDRESS, TX_USDC_COST);
+// 	const bestPoolKey = await router.findBestPoolKey(USDC_ADDRESS, TX_USDC_COST);
 
 // 	// prepare permit2
 // 	const permit2Single = permit2.buildPermit2Single(
