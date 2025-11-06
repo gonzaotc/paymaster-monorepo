@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeAll } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { parseUnits, type Address } from 'viem';
 import { privateKeyToAccount } from 'viem/accounts';
 import { sepolia } from 'viem/chains';
@@ -58,11 +58,7 @@ describe('SDK Smoke Tests', () => {
 				0
 			);
 
-			const signature = await permit2.signPermit2Single(
-				permit2Single,
-				mockAccount,
-				sepolia.id
-			);
+			const signature = await permit2.signPermit2Single(permit2Single, mockAccount, sepolia.id);
 
 			expect(signature).toBeDefined();
 			expect(signature).toMatch(/^0x[a-fA-F0-9]+$/);
@@ -102,11 +98,7 @@ describe('SDK Smoke Tests', () => {
 			expect(permit2Single).toBeDefined();
 
 			// 3. Sign permit2
-			const signature = await permit2.signPermit2Single(
-				permit2Single,
-				mockAccount,
-				sepolia.id
-			);
+			const signature = await permit2.signPermit2Single(permit2Single, mockAccount, sepolia.id);
 			expect(signature).toBeDefined();
 
 			// Note: paymaster.buildPaymasterData() is currently commented out in the SDK

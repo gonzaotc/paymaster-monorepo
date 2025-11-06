@@ -18,7 +18,7 @@ export interface Router {
 
 export const router: Router = {
 	async findBestPoolKey(token: Address, amount: bigint, chain: Chain): Promise<PoolKey> {
-		const client = createClient({chain, transport: http(),})
+		const client = createClient({ chain, transport: http() });
 
 		const bestPoolMock: PoolKey = {
 			currency0: ADDRESS_ZERO,
@@ -31,14 +31,14 @@ export const router: Router = {
 
 		const poolId = uniswapV4.toId(bestPoolMock);
 		console.log('poolId', poolId);
-	
+
 		const stateView = getContract({
 			// @TBD organize this in a better way
 			address: '0xc199f1072a74d4e905aba1a84d9a45e2546b6222' as Address,
 			abi: stateViewAbi,
 			client: { public: client },
 		});
-	
+
 		const liquidity = await stateView.read.getLiquidity([poolId]);
 		console.log('liquidit in pool', liquidity);
 		if (Number(liquidity) <= 0) throw new Error('No liquidity found in determined pool');
