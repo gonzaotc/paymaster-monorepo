@@ -1,9 +1,7 @@
 import { getChainConfig } from '../src/config';
-import { selectedChain } from '../hardhat.config';
 import { BundlerClient, createBundlerClient, toSimple7702SmartAccount } from 'viem/account-abstraction';
 import { privateKeyToAccount } from 'viem/accounts';
 import { createClient, publicActions, walletActions, http, erc20Abi, parseUnits, type Call } from 'viem';
-import { sepolia, unichainSepolia } from 'viem/chains';
 import { paymaster, permit2, router} from 'paymaster-sdk';
 
 /**
@@ -16,7 +14,7 @@ import { paymaster, permit2, router} from 'paymaster-sdk';
  * Uses the given bundler rpc url.
  */
 async function main() {
-	const chainConfig = getChainConfig(selectedChain);
+	const [chainConfig, chain] = getChainConfig();
 
     const USDC_TRANSFER_AMOUNT = parseUnits('1', 6); // 10 USDC
 
@@ -25,7 +23,7 @@ async function main() {
 
     const client = createClient({
         account: eoa,
-        chain: sepolia,
+        chain,
         transport: http(),
     })
         .extend(publicActions)
@@ -41,6 +39,7 @@ async function main() {
     // Check if the EOA has already been delegated via EIP-7702
     // EIP-7702 delegation code starts with 0xef0100 (magic prefix + version)
     const code = await client.getCode({ address: eoa.address });
+    console.log('eoa code', code);
     const isDelegated = code !== undefined && code.startsWith('0xef0100');
     
     let authorization;
@@ -69,13 +68,13 @@ async function main() {
     console.log('created tx');
 
     // estimate userOp
-    const gasInUsdc = parseUnits('1', 6);
+    const gasInUsdc = parseUnits('1', 6); // let's assume 1 USDC for gas
     const totalUsdcCost = gasInUsdc + USDC_TRANSFER_AMOUNT;
     console.log('estimated gas in usdc');
 
     console.log('finding best pool key for params');
     console.log('token', chainConfig.USDC);
-    const poolKey = await router.findBestPoolKey(chainConfig.USDC, totalUsdcCost, unichainSepolia);
+    const poolKey = await router.findBestPoolKey(chainConfig.USDC, totalUsdcCost, chain);
     console.log('found pool key');
 
     // prepare permit2
@@ -104,18 +103,18 @@ async function main() {
 	});
     console.log('built paymaster data');
 
-    // console.log('sending user operation');
-	// const hash = await bundlerClient.sendUserOperation({
-	// 	account,
-	// 	authorization,
-	// 	calls: [tx],
-    //     paymaster: chainConfig.PAYMASTER,
-    //     paymasterData,
-	// });
-	// console.log('sent user operation');
+    console.log('sending user operation');
+	const hash = await bundlerClient.sendUserOperation({
+		account,
+		authorization,
+		calls: [tx],
+        paymaster: chainConfig.PAYMASTER,
+        paymasterData,
+	});
+	console.log('sent user operation');
 
-	// const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
-	// console.log('UserOperation receipt', receipt);
+	const receipt = await bundlerClient.waitForUserOperationReceipt({ hash });
+	console.log('UserOperation receipt', receipt);
 }
 
 main()

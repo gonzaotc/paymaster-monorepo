@@ -1,9 +1,7 @@
 import { getChainConfig } from '../src/config';
-import { selectedChain } from '../hardhat.config';
 import { BundlerClient, createBundlerClient, toSimple7702SmartAccount } from 'viem/account-abstraction';
 import { privateKeyToAccount } from 'viem/accounts';
 import { createClient, publicActions, walletActions, http, erc20Abi, parseUnits, type Call } from 'viem';
-import { sepolia } from 'viem/chains';
 
 /**
  * Convert the EOA into a Simple Smart Account via EIP-7702 signatures.
@@ -11,16 +9,16 @@ import { sepolia } from 'viem/chains';
  * Uses the given bundler rpc url.
  */
 async function main() {
-	const chainConfig = getChainConfig(selectedChain);
+	const [chainConfig, chain] = getChainConfig();
 
     const USDC_TRANSFER_AMOUNT = parseUnits('1', 6); // 1 USDC
 
     const eoa = privateKeyToAccount(chainConfig.USER_PRIVATE_KEY);
-    console.log('created eoa');
+    console.log('created eoa:');
 
     const client = createClient({
         account: eoa,
-        chain: sepolia,
+        chain,
         transport: http(),
     })
         .extend(publicActions)
@@ -34,6 +32,7 @@ async function main() {
     console.log('created account');
 
     const code = await client.getCode({ address: eoa.address });
+    console.log('eoa code', code);
     const isDelegated = code !== undefined && code.startsWith('0xef0100');
     
     let authorization;

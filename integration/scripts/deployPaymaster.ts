@@ -8,7 +8,7 @@ import { selectedChain } from '../hardhat.config';
  * Deploy the UniswapPaymaster contract to the selected chain
  */
 async function main() {
-	const chainConfig = getChainConfig(selectedChain);
+	const [chainConfig, chain] = getChainConfig(selectedChain);
 	const [deployer] = await hre.viem.getWalletClients();
 	const publicClient = await hre.viem.getPublicClient();
 

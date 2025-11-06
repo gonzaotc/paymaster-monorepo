@@ -8,10 +8,10 @@ import { getChainConfig } from "./src/config";
 // Load environment variables from .env file
 dotenvConfig({ path: resolve(__dirname, ".env") });
 
-export const selectedChain: string = 'unichainSepolia';
-export const chainConfig = getChainConfig(selectedChain);
+export const [chainConfig, chain] = getChainConfig();
 
 const config: HardhatUserConfig = {
+  defaultNetwork: chainConfig.name,
   solidity: {
     version: "0.8.30",
     settings: {

@@ -1,6 +1,7 @@
 import { Address, Hex } from "viem";
 import { config as dotenvConfig } from "dotenv";
 import { resolve } from "path";
+import { Chain, sepolia, unichainSepolia, mainnet } from "viem/chains";
 
 // Load environment variables from .env file
 dotenvConfig({ path: resolve(__dirname, "../.env") });
@@ -38,7 +39,7 @@ export type ChainConfig = {
 export const chainConfig: Record<string, ChainConfig> = {
     sepolia: {
         id: 11155111,
-        name: 'Sepolia',
+        name: 'sepolia',
         //
         RPC_URL: process.env.RPC_URL_SEPOLIA as string,
         BUNDLER_URL: process.env.BUNDLER_URL_SEPOLIA as string,
@@ -61,7 +62,7 @@ export const chainConfig: Record<string, ChainConfig> = {
     },
     unichainSepolia: {
         id: 1301,
-        name: 'Unichain Sepolia',
+        name: 'unichainSepolia',
         //
         RPC_URL: process.env.RPC_URL_UNICHAIN_SEPOLIA as string,
         BUNDLER_URL: process.env.BUNDLER_URL_UNICHAIN_SEPOLIA as string,
@@ -84,7 +85,7 @@ export const chainConfig: Record<string, ChainConfig> = {
     },
     mainnet: {
         id: 1,
-        name: 'Mainnet',
+        name: 'mainnet',
         //
         RPC_URL: process.env.RPC_URL_MAINNET as string,
         BUNDLER_URL: process.env.BUNDLER_URL_MAINNET as string,
@@ -112,7 +113,12 @@ export const chainConfig: Record<string, ChainConfig> = {
  * @param chain - The chain to get the configuration for
  * @returns The chain configuration
  */
-export const getChainConfig = (chain: string): ChainConfig => {
+export const getChainConfig = (): [ChainConfig, Chain] => {
+    const chain = process.env.SELECTED_NETWORK;
+    if (!chain) throw new Error('!SELECTED_NETWORK ENV');
+
+    const viemChain = getChain(chain);
+
     if (!chainConfig[chain]) {
         throw new Error(`Chain ${chain} not configured`);
     }
@@ -151,6 +157,18 @@ export const getChainConfig = (chain: string): ChainConfig => {
             `Missing environment variables for ${chain}:\n  - ${missingVars.join('\n  - ')}`
         );
     }
-    
-    return config;
+
+    return [config, viemChain];
+}
+
+function getChain(name: string): Chain {
+    switch (name) {
+        case 'sepolia':
+            return sepolia;
+        case 'unichainSepolia':
+            return unichainSepolia;
+        case 'mainnet':
+            return mainnet;
+    }
+    throw new Error(`Chain ${name} not found`);
 }
