@@ -157,7 +157,7 @@ abstract contract ERC6909NativeEntryPointVault is ERC6909TokenSupply {
      * NOTE: ETH is already received via `msg.value` in `deposit`, so we only need to track it.
      */
     function _deposit(address caller, address receiver, uint256 assets, uint256 shares, uint256 id) internal virtual {
-        _assets[id] += assets;
+        _increaseAssets(id, assets);
         _mint(receiver, id, shares);
         entryPoint().depositTo{value: assets}(address(this));
 
@@ -178,9 +178,17 @@ abstract contract ERC6909NativeEntryPointVault is ERC6909TokenSupply {
         }
 
         _burn(owner, id, shares);
-        _assets[id] -= assets;
+        _decreaseAssets(id, assets);
         entryPoint().withdrawTo(payable(receiver), assets);
 
         emit Withdraw(caller, receiver, owner, assets, shares, id);
+    }
+
+    function _increaseAssets(uint256 id, uint256 amount) internal virtual {
+        _assets[id] += amount;
+    }
+
+    function _decreaseAssets(uint256 id, uint256 amount) internal virtual {
+        _assets[id] -= amount;
     }
 }

@@ -104,10 +104,12 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         uint256 actualTokenAmount = _erc20Cost(actualGasCost, actualUserOpFeePerGas, tokenPriceInEth, feesBps);
 
         // 2. transfer the excess token amount to the user
+        // @TODO: optional optimization: only send the excess if its value is larger than the cost of sending them
         uint256 excessTokenAmount = prefund - actualTokenAmount;
-
-        // @tbd optional optimization: only send the excess if its value is larger than the cost of sending them
         if (excessTokenAmount > 0) IERC20(token).safeTransfer(sender, excessTokenAmount);
+
+        // track the gas spent in the token pool
+        _decreaseAssets(uint256(uint160(token)), actualGasCost);
     }
 
     /// @dev Calculates the cost of the user operation in ETH.
@@ -166,6 +168,9 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
 
         // 9. send back any excess eth to the receiver
         payable(receiver).transfer(msg.value - ethAmountAfterDiscount);
+
+        // 10. track the eth added to the pool
+        _increaseAssets(uint256(uint160(token)), msg.value);
 
         emit PoolRebalanced(token, ethAmountAfterDiscount, tokenAmount);
     }
