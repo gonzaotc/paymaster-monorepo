@@ -35,13 +35,9 @@ contract UserOpHelper is Test {
             nonce: nonce,
             initCode: "",
             callData: callData,
-            accountGasLimits: bytes32(
-                abi.encodePacked(uint128(verificationGasLimit), uint128(callGasLimit))
-            ),
+            accountGasLimits: bytes32(abi.encodePacked(uint128(verificationGasLimit), uint128(callGasLimit))),
             preVerificationGas: preVerificationGas,
-            gasFees: bytes32(
-                abi.encodePacked(uint128(maxPriorityFeePerGas), uint128(maxFeePerGas))
-            ),
+            gasFees: bytes32(abi.encodePacked(uint128(maxPriorityFeePerGas), uint128(maxFeePerGas))),
             paymasterAndData: paymasterAndData,
             signature: ""
         });
@@ -69,11 +65,11 @@ contract UserOpHelper is Test {
     /**
      * @dev Signs a UserOperation with the given private key
      */
-    function signUserOp(
-        PackedUserOperation calldata userOp,
-        uint256 privateKey,
-        address entryPoint
-    ) public view returns (PackedUserOperation memory signedUserOp) {
+    function signUserOp(PackedUserOperation calldata userOp, uint256 privateKey, address entryPoint)
+        public
+        view
+        returns (PackedUserOperation memory signedUserOp)
+    {
         bytes32 userOpHash = userOp.hash(entryPoint);
         (uint8 v, bytes32 r, bytes32 s) = vm.sign(privateKey, userOpHash);
 

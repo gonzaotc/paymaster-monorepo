@@ -90,10 +90,7 @@ contract PaymasterTest is Test, Deployers, UserOpHelper, TestingUtils {
 
     function setUp() public {
         // deploy the entrypoint
-        deployCodeTo(
-            "account-abstraction/contracts/core/EntryPoint.sol",
-            address(ERC4337Utils.ENTRYPOINT_V08)
-        );
+        deployCodeTo("account-abstraction/contracts/core/EntryPoint.sol", address(ERC4337Utils.ENTRYPOINT_V08));
         entryPoint = EntryPoint(payable(address(ERC4337Utils.ENTRYPOINT_V08)));
 
         // deploy uniswap interface
@@ -147,8 +144,7 @@ contract PaymasterTest is Test, Deployers, UserOpHelper, TestingUtils {
         uint128 liquidityToAdd = 1e22;
 
         // get eth amounts for 1e18 liquidity
-        (uint256 ethAmount,) =
-            getAmountsForLiquidity(manager, key, liquidityToAdd, _getTickLower(), _getTickUpper());
+        (uint256 ethAmount,) = getAmountsForLiquidity(manager, key, liquidityToAdd, _getTickLower(), _getTickUpper());
         uint256 ethAmountPlusBuffer = ethAmount * 110 / 100; // 10% buffer, rest is refunded by the swap router
 
         // lp1 adds 1e18 liquidity
@@ -178,16 +174,9 @@ contract PaymasterTest is Test, Deployers, UserOpHelper, TestingUtils {
         return 60;
     }
 
-    function _liquidityParams(int256 liquidityDelta)
-        public
-        pure
-        returns (ModifyLiquidityParams memory)
-    {
+    function _liquidityParams(int256 liquidityDelta) public pure returns (ModifyLiquidityParams memory) {
         return ModifyLiquidityParams({
-            tickLower: _getTickLower(),
-            tickUpper: _getTickUpper(),
-            liquidityDelta: liquidityDelta,
-            salt: bytes32(0)
+            tickLower: _getTickLower(), tickUpper: _getTickUpper(), liquidityDelta: liquidityDelta, salt: bytes32(0)
         });
     }
 
@@ -214,8 +203,7 @@ contract PaymasterTest is Test, Deployers, UserOpHelper, TestingUtils {
         permit2.permit(EOA, permitSingle, signature);
 
         // 4. Verify allowance was established
-        (uint160 amount, uint48 exp, uint48 storedNonce) =
-            permit2.allowance(EOA, address(token), address(paymaster));
+        (uint160 amount, uint48 exp, uint48 storedNonce) = permit2.allowance(EOA, address(token), address(paymaster));
         assertEq(amount, permitSingle.details.amount);
         assertEq(exp, permitSingle.details.expiration);
         assertEq(storedNonce, permitSingle.details.nonce + 1); // Nonce is incremented
@@ -232,16 +220,14 @@ contract PaymasterTest is Test, Deployers, UserOpHelper, TestingUtils {
     // EIP-7702 tests require Foundry nightly with Vm.SignedDelegation support
     function test_eip7702_delegation() public {
         assertEq(address(EOA).code.length, 0);
-        Vm.SignedDelegation memory signedDelegation =
-            vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
         bytes memory expectedCode = abi.encodePacked(hex"ef0100", address(account));
         assertEq(address(EOA).code, expectedCode);
     }
 
     function test_ERC1271_signature() public {
-        Vm.SignedDelegation memory signedDelegation =
-            vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
         string memory text = "Hello, world!";
         bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n13", text));
@@ -272,8 +258,7 @@ contract PaymasterTest is Test, Deployers, UserOpHelper, TestingUtils {
         token.mint(EOA, 1000e18);
 
         // 2. Delegate to the account
-        Vm.SignedDelegation memory signedDelegation =
-            vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
 
         // 2. Create gasless permit2 signature for paymaster

@@ -3,10 +3,7 @@ pragma solidity ^0.8.26;
 
 // External
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
-import {
-    ERC4337Utils,
-    PackedUserOperation
-} from "@openzeppelin/contracts/account/utils/draft-ERC4337Utils.sol";
+import {ERC4337Utils, PackedUserOperation} from "@openzeppelin/contracts/account/utils/draft-ERC4337Utils.sol";
 import {IEntryPoint} from "@openzeppelin/contracts/interfaces/draft-IERC4337.sol";
 import {CurrencySettler} from "@openzeppelin/uniswap-hooks/src/utils/CurrencySettler.sol";
 import {TickMath} from "@uniswap/v4-core/src/libraries/TickMath.sol";
@@ -66,16 +63,14 @@ contract UniswapPaymaster is MinimalPaymasterCore, EntryPointVault {
 
     /// @dev Validates the paymaster's willingness to pay for the user operation by executing a token-to-ETH swap.
     /// @dev Establishes a Permit2 allowance and swaps user tokens for the required ETH amount.
-    function _validatePaymasterUserOp(
-        PackedUserOperation calldata userOp,
-        bytes32,
-        uint256 maxCost
-    ) internal virtual override returns (bytes memory context, uint256 validationData) {
-        (
-            PoolKey memory poolKey,
-            IAllowanceTransfer.PermitSingle memory permit,
-            bytes memory signature
-        ) = abi.decode(userOp.paymasterData(), (PoolKey, IAllowanceTransfer.PermitSingle, bytes));
+    function _validatePaymasterUserOp(PackedUserOperation calldata userOp, bytes32, uint256 maxCost)
+        internal
+        virtual
+        override
+        returns (bytes memory context, uint256 validationData)
+    {
+        (PoolKey memory poolKey, IAllowanceTransfer.PermitSingle memory permit, bytes memory signature) =
+            abi.decode(userOp.paymasterData(), (PoolKey, IAllowanceTransfer.PermitSingle, bytes));
 
         if (
             !poolKey.currency0.isAddressZero() // the pool must support native currency
@@ -117,11 +112,7 @@ contract UniswapPaymaster is MinimalPaymasterCore, EntryPointVault {
     }
 
     /// @dev Called back by the pool manager after the swap is init.
-    function unlockCallback(bytes calldata rawData)
-        external
-        onlyPoolManager
-        returns (bytes memory)
-    {
+    function unlockCallback(bytes calldata rawData) external onlyPoolManager returns (bytes memory) {
         CallbackData memory data = abi.decode(rawData, (CallbackData));
         BalanceDelta swapDelta = manager.swap(data.key, data.params, "");
 
@@ -151,12 +142,11 @@ contract UniswapPaymaster is MinimalPaymasterCore, EntryPointVault {
     /// @param context Encoded user address and prefund amount from validation
     /// @param actualGasCost The actual gas cost consumed by the user operation
     /// @param actualUserOpFeePerGas The actual fee per gas paid
-    function _postOp(
-        PostOpMode mode,
-        bytes calldata context,
-        uint256 actualGasCost,
-        uint256 actualUserOpFeePerGas
-    ) internal virtual override {
+    function _postOp(PostOpMode mode, bytes calldata context, uint256 actualGasCost, uint256 actualUserOpFeePerGas)
+        internal
+        virtual
+        override
+    {
         (address userOpSender, uint256 prefundRequired) = abi.decode(context, (address, uint256));
 
         uint256 totalUsed = _ethCost(actualGasCost, actualUserOpFeePerGas);
@@ -182,13 +172,7 @@ contract UniswapPaymaster is MinimalPaymasterCore, EntryPointVault {
         return 30_000;
     }
 
-    function entryPoint()
-        public
-        view
-        virtual
-        override(MinimalPaymasterCore, EntryPointVault)
-        returns (IEntryPoint)
-    {
+    function entryPoint() public view virtual override(MinimalPaymasterCore, EntryPointVault) returns (IEntryPoint) {
         return super.entryPoint();
     }
 
