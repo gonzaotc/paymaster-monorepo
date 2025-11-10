@@ -89,6 +89,16 @@ export function PoolAnalyticsShell({
   }, [isPanelMounted]);
 
   useEffect(() => {
+    if (isPanelOpen) {
+      const originalOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = originalOverflow;
+      };
+    }
+  }, [isPanelOpen]);
+
+  useEffect(() => {
     if (closeTimerRef.current) {
       clearTimeout(closeTimerRef.current);
       closeTimerRef.current = null;
