@@ -1,3 +1,4 @@
+import { PasskeyStatusPanel } from '@/components/passkey-status-panel';
 import { PoolSection } from '@/components/pool-section';
 
 const stats = [
@@ -39,6 +40,8 @@ const poolActions = [
 ];
 
 export default function Home() {
+  const privyEnabled = Boolean(process.env.NEXT_PUBLIC_PRIVY_APP_ID);
+
   return (
     <main className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-8">
@@ -72,6 +75,22 @@ export default function Home() {
               </div>
             ))}
           </div>
+        </section>
+
+        <section className={`${panelClass} space-y-6`}>
+          <div className="flex flex-col gap-2 text-center sm:text-left">
+            <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
+              Authentication preview
+            </p>
+            <h2 className="text-2xl font-semibold text-slate-900">
+              Privy passkey login
+            </h2>
+            <p className="text-sm text-slate-600">
+              Use this standalone probe to confirm Privy SDK readiness, session state, and the
+              passkey challenge flow without wiring it into the rest of the dashboard.
+            </p>
+          </div>
+          <PasskeyStatusPanel enabled={privyEnabled} />
         </section>
 
         <PoolSection actions={poolActions} />
