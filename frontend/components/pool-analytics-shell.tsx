@@ -19,9 +19,7 @@ export function PoolAnalyticsShell({
   data = defaultPoolData,
   actions = [],
 }: PoolAnalyticsShellProps) {
-  const [selectedPoolId, setSelectedPoolId] = useState<string | null>(
-    data[0]?.id ?? null
-  );
+  const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isPanelMounted, setIsPanelMounted] = useState(false);
@@ -45,6 +43,7 @@ export function PoolAnalyticsShell({
 
   const closePanel = () => {
     setIsPanelOpen(false);
+    setSelectedPoolId(null);
   };
 
   useEffect(() => {
