@@ -211,7 +211,7 @@ const columns: ColumnDef<PoolRow>[] = [
   },
   {
     header: () =>
-      makeHeader('Rebalance F', 'How often the automation balances this pool.'),
+      makeHeader('Rebalance F', 'How often the pool needs to be rebalanced.'),
     accessorKey: 'rebalanceFrequency',
     enableSorting: false,
   },

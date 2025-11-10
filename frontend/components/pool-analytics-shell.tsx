@@ -1,6 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import {
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+} from 'react';
 import { PoolRow, PoolTable, defaultPoolData } from '@/components/pool-table';
 
 type PoolAction = {
@@ -13,21 +20,38 @@ type PoolAction = {
 type PoolAnalyticsShellProps = {
   data?: PoolRow[];
   actions?: PoolAction[];
+  searchQuery?: string;
 };
 
 export function PoolAnalyticsShell({
   data = defaultPoolData,
   actions = [],
+  searchQuery = '',
 }: PoolAnalyticsShellProps) {
   const [selectedPoolId, setSelectedPoolId] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const deferredQuery = useDeferredValue(searchQuery);
+  const [, startTransition] = useTransition();
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [isPanelMounted, setIsPanelMounted] = useState(false);
   const closeTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  const filteredData = useMemo(() => {
+    if (!deferredQuery.trim()) {
+      return data;
+    }
+    const normalized = deferredQuery.trim().toLowerCase();
+    return data.filter((pool) => {
+      const matchPool = pool.pool.toLowerCase().includes(normalized);
+      const matchTokens = pool.tokens?.some((token) =>
+        token.toLowerCase().includes(normalized)
+      );
+      return matchPool || matchTokens;
+    });
+  }, [data, deferredQuery]);
+
   const selectedPool = useMemo(
-    () => data.find((pool) => pool.id === selectedPoolId) ?? null,
-    [data, selectedPoolId]
+    () => filteredData.find((pool) => pool.id === selectedPoolId) ?? null,
+    [filteredData, selectedPoolId]
   );
 
   const handleSelectRow = (row: PoolRow) => {
@@ -100,7 +124,7 @@ export function PoolAnalyticsShell({
   return (
     <div className="relative">
       <PoolTable
-        data={data}
+        data={filteredData}
         className="bg-white"
         onSelectRow={handleSelectRow}
         selectedPoolId={selectedPoolId}

@@ -1,4 +1,4 @@
-import { PoolAnalyticsShell } from '@/components/pool-analytics-shell';
+import { PoolSection } from '@/components/pool-section';
 
 const stats = [
   { label: 'Network TVL', value: '$75.4M', change: '+12.1% vs last week' },
@@ -74,25 +74,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="space-y-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
-                Pools
-              </p>
-            </div>
-
-            <div className="flex gap-2 text-sm text-slate-500">
-              <span className="rounded-full bg-white/95 px-4 py-2 shadow-sm">
-                Live
-              </span>
-              <span className="rounded-full border border-slate-200/80 bg-white px-4 py-2">
-                Last 7 days
-              </span>
-            </div>
-          </div>
-          <PoolAnalyticsShell actions={poolActions} />
-        </section>
+        <PoolSection actions={poolActions} />
       </div>
     </main>
   );
