@@ -9,11 +9,21 @@ import {SignerECDSA} from "@openzeppelin/contracts/utils/cryptography/signers/Si
 contract MinimalAccountECDSA is Account, IERC1271, SignerECDSA {
     constructor(address signer) SignerECDSA(signer) {}
 
-    function isValidSignature(bytes32 hash, bytes calldata signature) public view override returns (bytes4) {
-        return _rawSignatureValidation(hash, signature) ? IERC1271.isValidSignature.selector : bytes4(0xffffffff);
+    function isValidSignature(bytes32 hash, bytes calldata signature)
+        public
+        view
+        override
+        returns (bytes4)
+    {
+        return _rawSignatureValidation(hash, signature)
+            ? IERC1271.isValidSignature.selector
+            : bytes4(0xffffffff);
     }
 
-    function execute(address target, uint256 value, bytes calldata data) external onlyEntryPointOrSelf {
+    function execute(address target, uint256 value, bytes calldata data)
+        external
+        onlyEntryPointOrSelf
+    {
         (bool success, bytes memory result) = target.call{value: value}(data);
         if (!success) {
             assembly {
