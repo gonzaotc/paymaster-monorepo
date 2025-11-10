@@ -11,6 +11,7 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {MinimalPaymasterCore} from "./MinimalPaymasterCore.sol";
 import {ERC6909NativeEntryPointVault} from "./ERC6909NativeEntryPointVault.sol";
 import {IOracle} from "./IOracle.sol";
+import {console} from "forge-std/console.sol";
 
 contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVault {
     using ERC4337Utils for PackedUserOperation;
@@ -78,6 +79,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
 
         // 6. calculate the prefund amount
         uint256 prefund = _erc20Cost(maxCost, userOp.maxFeePerGas(), tokenPriceInEth, feesBps);
+        console.log("prefund in tokens: ", prefund);
 
         // 7. attempt to transfer the prefund amount from the user to the paymaster
         bool prefunded = IERC20(token).trySafeTransferFrom(userOp.sender, address(this), prefund);
@@ -102,14 +104,16 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
 
         // 2. convert from gas amount to token amount
         uint256 actualTokenAmount = _erc20Cost(actualGasCost, actualUserOpFeePerGas, tokenPriceInEth, feesBps);
+        console.log("actualTokenAmount: ", actualTokenAmount);
 
         // 2. transfer the excess token amount to the user
         // @TODO: optional optimization: only send the excess if its value is larger than the cost of sending them
         uint256 excessTokenAmount = prefund - actualTokenAmount;
+        console.log("refund in tokens: ", excessTokenAmount);
         if (excessTokenAmount > 0) IERC20(token).safeTransfer(sender, excessTokenAmount);
 
         // track the gas spent in the token pool
-        _decreaseAssets(uint256(uint160(token)), actualGasCost);
+        _decreaseAssets(uint256(uint160(token)), _gasCost(actualGasCost, actualUserOpFeePerGas));
     }
 
     /// @dev Calculates the cost of the user operation in ETH.
@@ -117,15 +121,20 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
     /// @param feePerGas The fee per gas of the user operation.
     /// @param tokenPrice The price of the token in ETH.
     /// @param feesBps The fees in basis points. i.e 100bps = 1%
-    /// @return erc20Cost The cost of the user operation in the token.
+    /// @return erc20CostWithFees The cost of the user operation in the token, including fees.
     function _erc20Cost(uint256 cost, uint256 feePerGas, uint256 tokenPrice, uint256 feesBps)
         internal
         view
         virtual
-        returns (uint256 erc20Cost)
+        returns (uint256 erc20CostWithFees)
     {
-        uint256 baseCost = (cost + _postOpCost() * feePerGas).mulDiv(tokenPrice, _tokenPriceDenominator());
-        erc20Cost = baseCost + (baseCost * feesBps / 10000);
+        uint256 gasCost = _gasCost(cost, feePerGas);
+        uint256 baseErc20Cost = gasCost.mulDiv(tokenPrice, _tokenPriceDenominator());
+        erc20CostWithFees = baseErc20Cost + (baseErc20Cost * feesBps / 10000);
+    }
+
+    function _gasCost(uint256 cost, uint256 feePerGas) internal view virtual returns (uint256 gasCost) {
+        return (cost + _postOpCost() * feePerGas);
     }
 
     /// @dev Denominator used for interpreting the `tokenPrice` returned by {_fetchDetails} as "fixed point" in {_erc20Cost}.
@@ -135,24 +144,28 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
 
     /// @dev Over-estimates the cost of the post-operation logic
     function _postOpCost() internal pure returns (uint256) {
-        return 30_000;
+        return 50_000;
     }
 
-    // allows anyone to rebalance the pool by buying tokens for eth at a discount price, 
-    // an economic incentive paid by the users to the rebalancers.
-    function rebalance(address token, uint256 tokenAmount, address receiver) payable public returns (uint256 ethAmountAfterDiscount) {
+    // allows anyone to rebalance the pool by buying tokens for eth at a discount price
+    // of `rebalancingDiscountBps` basis points, an economic incentive paid by the users to the rebalancers.
+    function rebalance(address token, uint256 tokenAmount, address receiver)
+        public
+        payable
+        returns (uint256 ethAmountAfterDiscount)
+    {
         // 1. get the oracle and validate the pool exists
         IOracle oracle = oracles[token];
         require(address(oracle) != address(0), PoolNotInitialized(token));
 
-        // 2. validate the pool has enough tokenAmount to sell 
+        // 2. validate the pool has enough tokenAmount to sell
         require(getPoolTokenReserves(token) >= tokenAmount, PoolNotEnoughTokenReserves(token));
 
         // 3. query the token price from oracle
         uint256 tokenPriceInEth = oracle.getTokenPriceInEth();
 
         // 4. calculate the eth amount for buying the token amount
-        uint256 ethAmount = tokenAmount * tokenPriceInEth;
+        uint256 ethAmount = tokenAmount * tokenPriceInEth / 1e18;
 
         // 5. get the rebalancing discount in basis points
         uint256 rebalancingDiscountBps = getRebalancingFee(token);
@@ -160,17 +173,22 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         // 6. calculate the eth amount after the rebalancing discount
         ethAmountAfterDiscount = ethAmount - (ethAmount * rebalancingDiscountBps / 10000);
 
-        // 7. validate the eth amount after the rebalancing discount is greater than the msg.value
-        require(ethAmountAfterDiscount >= msg.value, NotEnoughEthSent(token));
-
-        // 8. send the bought tokens to the receiver
-        IERC20(token).safeTransferFrom(address(this), receiver, tokenAmount);
-
-        // 9. send back any excess eth to the receiver
-        payable(receiver).transfer(msg.value - ethAmountAfterDiscount);
+        // 7. validate the msg.value amount is enough to cover the eth amount after the rebalancing discount
+        require(msg.value >= ethAmountAfterDiscount, NotEnoughEthSent(token));
 
         // 10. track the eth added to the pool
-        _increaseAssets(uint256(uint160(token)), msg.value);
+        _increaseAssets(uint256(uint160(token)), ethAmountAfterDiscount);
+
+        // 11. put the eth into the entrypoint
+        entryPoint().depositTo{value: ethAmountAfterDiscount}(address(this));
+
+        // 8. send the bought tokens to the receiver
+        IERC20(token).safeTransfer(receiver, tokenAmount);
+
+        // 9. send back any excess eth to the receiver
+        uint256 excessEth = msg.value - ethAmountAfterDiscount;
+
+        if (excessEth > 0) payable(receiver).transfer(excessEth);
 
         emit PoolRebalanced(token, ethAmountAfterDiscount, tokenAmount);
     }
@@ -191,7 +209,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
     }
 
     // the pool fee is expressed in basis points (bps)
-    // i.e: 190 bps = 1.90%
+    // i.e: 100 bps = 1%
     //
     // to be done: the pool fee should be a relationship between the token reserves and the eth reserves.
     // A kind of bounding curve must be implemented where:
@@ -199,7 +217,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
     // When tokenReserves are zero, the fee is minimum (e.g 0.1%)
     //
     function getRebalancingFee(address token) public pure returns (uint24 feeBps) {
-        return 190;
+        return 100;
     }
 
     // the pool LP fee is expressed in basis points (bps)

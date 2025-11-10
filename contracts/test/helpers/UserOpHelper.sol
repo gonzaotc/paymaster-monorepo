@@ -50,15 +50,13 @@ contract UserOpHelper is Test {
         address paymaster,
         uint128 paymasterVerificationGasLimit,
         uint128 paymasterPostOpGasLimit,
-        PoolKey memory poolKey,
-        IAllowanceTransfer.PermitSingle memory permitSingle,
-        bytes memory signature
+        address token
     ) public pure returns (bytes memory) {
         return abi.encodePacked(
             paymaster,
             paymasterVerificationGasLimit,
             paymasterPostOpGasLimit,
-            abi.encode(poolKey, permitSingle, signature)
+            abi.encode(token)
         );
     }
 

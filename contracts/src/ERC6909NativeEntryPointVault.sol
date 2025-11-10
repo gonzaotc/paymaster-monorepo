@@ -5,6 +5,8 @@ import {ERC6909TokenSupply} from "@openzeppelin/contracts/token/ERC6909/extensio
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IEntryPoint} from "@openzeppelin/contracts/interfaces/draft-IERC4337.sol";
 import {ERC4337Utils} from "@openzeppelin/contracts/account/utils/draft-ERC4337Utils.sol";
+// test
+import {console} from "forge-std/console.sol";
 
 abstract contract ERC6909NativeEntryPointVault is ERC6909TokenSupply {
     using Math for uint256;

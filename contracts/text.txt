@@ -1,0 +1,24 @@
+Compiler run failed:
+Warning (2519): This declaration shadows an existing declaration.
+ --> test/mocks/OracleMock.sol:9:17:
+  |
+9 |     constructor(uint256 _tokenPriceInEth) {
+  |                 ^^^^^^^^^^^^^^^^^^^^^^^^
+Note: The shadowed declaration is here:
+ --> test/mocks/OracleMock.sol:7:5:
+  |
+7 |     uint256 private _tokenPriceInEth;
+  |     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Error (7576): Undeclared identifier.
+   --> test/UniversalPaymaster.t.sol:230:41:
+    |
+230 |         int256 entrypointDelta = int256(entrypointDepositAfter) - int256(entrypointDepositBefore);
+    |                                         ^^^^^^^^^^^^^^^^^^^^^^
+
+Error (7576): Undeclared identifier.
+   --> test/UniversalPaymaster.t.sol:230:74:
+    |
+230 |         int256 entrypointDelta = int256(entrypointDepositAfter) - int256(entrypointDepositBefore);
+    |                                                                          ^^^^^^^^^^^^^^^^^^^^^^^
+
