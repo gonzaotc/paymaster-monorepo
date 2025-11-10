@@ -75,7 +75,10 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
 
     function setUp() public {
         // deploy the entrypoint
-        deployCodeTo("account-abstraction/contracts/core/EntryPoint.sol", address(ERC4337Utils.ENTRYPOINT_V08));
+        deployCodeTo(
+            "account-abstraction/contracts/core/EntryPoint.sol",
+            address(ERC4337Utils.ENTRYPOINT_V08)
+        );
         entryPoint = EntryPoint(payable(address(ERC4337Utils.ENTRYPOINT_V08)));
 
         // deploy the paymaster
@@ -92,7 +95,7 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
         account = new MinimalAccountEIP7702();
 
         // initialize the pool
-        paymaster.initializePool(address(token), address(oracle));
+        paymaster.initializePool(address(token), 100, 100, address(oracle));
 
         // create accounts
         (bundler) = makeAddr("bundler");
@@ -114,14 +117,16 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
     // EIP-7702 tests require Foundry nightly with Vm.SignedDelegation support
     function test_eip7702_delegation() public {
         assertEq(address(EOA).code.length, 0);
-        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation =
+            vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
         bytes memory expectedCode = abi.encodePacked(hex"ef0100", address(account));
         assertEq(address(EOA).code, expectedCode);
     }
 
     function test_ERC1271_signature() public {
-        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation =
+            vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
         string memory text = "Hello, world!";
         bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n13", text));
@@ -154,7 +159,7 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
         paymaster.deposit{value: 1e18}(1e18, depositor, tokenId);
         vm.stopPrank();
 
-        // paymater now has 1 eth deposited in the entrypoint 
+        // paymater now has 1 eth deposited in the entrypoint
         assertEq(entryPoint.balanceOf(address(paymaster)), 1e18);
 
         // paymaster now has 1 eth deposited in the token pool
@@ -173,14 +178,15 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
         assertEq(token.allowance(EOA, address(paymaster)), type(uint256).max);
 
         // 2. Delegate to the account
-        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation =
+            vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
 
         GasConfiguration memory gasConfig = GasConfiguration({
             preVerificationGas: 1_000, // Extra gas to pay the bundler operational costs such as bundle tx cost and entrypoint static code execution.
             verificationGasLimit: 49_990, // The amount of gas to allocate for the verification step
             paymasterVerificationGasLimit: 63_450, // The amount of gas to allocate for the paymaster validation code (only if paymaster exists)
-            paymasterPostOpGasLimit: 20_100, // The amount of gas to allocate for the paymaster post-operation code (only if paymaster exists)
+            paymasterPostOpGasLimit: 22_100, // The amount of gas to allocate for the paymaster post-operation code (only if paymaster exists)
             callGasLimit: 30_250, // The amount of gas to allocate the main execution call
             maxPriorityFeePerGas: 1 gwei, // Maximum priority fee per gas (similar to EIP-1559 max_priority_fee_per_gas)
             maxFeePerGas: 1 gwei // Maximum fee per gas (similar to EIP-1559 max_fee_per_gas)
@@ -229,8 +235,29 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
         IEntryPoint(address(entryPoint)).handleOps(userOps, payable(bundler));
         vm.stopPrank();
         console.log("Sponsoring done!");
-        
-        return;
+
+        uint256 depositorAssetsAfterSponsoring = paymaster.maxWithdraw(depositor, tokenId);
+        uint256 totalAssetsAfterSponsoring = paymaster.totalAssets(tokenId);
+        uint256 entryPointDepositAfterSponsoring = entryPoint.balanceOf(address(paymaster));
+
+        // console.log("total assets after sponsoring: ", totalAssetsAfterSponsoring);
+        // console.log("entry point deposit after sponsoring: ", entryPointDepositAfterSponsoring);
+
+        int256 entryPointVsDepositorDelta =
+            int256(entryPointDepositAfterSponsoring) - int256(depositorAssetsAfterSponsoring);
+        console.log("entry point vs depositor delta: ", entryPointVsDepositorDelta);
+
+        assertEq(
+            depositorAssetsAfterSponsoring,
+            totalAssetsAfterSponsoring,
+            "depositor assets != total assets"
+        );
+        assertApproxEqAbs(
+            entryPointDepositAfterSponsoring,
+            depositorAssetsAfterSponsoring,
+            1e12,
+            "entry point deposit != depositor assets"
+        );
 
         // 8. Rebalancer rebalances the pool buying all the tokens available
         vm.startPrank(rebalancer);
@@ -242,19 +269,19 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
         assertEq(token.balanceOf(address(paymaster)), 0);
 
         // 9. Depositor withdraws their eth
-        uint256 entrypointDeposit = entryPoint.balanceOf(address(paymaster));
         uint256 depositorAssets = paymaster.maxWithdraw(depositor, tokenId);
         uint256 totalAssets = paymaster.totalAssets(tokenId);
+        assertGe(
+            totalAssets,
+            depositorAssets,
+            "total assets should be greater than or equal to depositor assets"
+        );
+        assertEq(
+            depositorAssets,
+            totalAssets - 1,
+            "depositor assets should be the total assets minus the inflation protection"
+        );
 
-        console.log("entrypoint deposit: ", entrypointDeposit);
-        console.log("total assets: ", totalAssets);
-        console.log("depositor assets: ", depositorAssets);
-
-        assertGe(totalAssets, depositorAssets, "total assets should be greater than or equal to depositor assets");
-
-        // depositor must own approximately the total assets, minus the inflation protection.
-        assertEq(depositorAssets, totalAssets - 1, "depositor assets should be the total assets minus the inflation protection");
-    
         vm.startPrank(depositor);
         paymaster.withdraw(depositorAssets, depositor, depositor, tokenId);
         vm.stopPrank();
@@ -276,22 +303,27 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
         uint256 rebalancerTokensAfter = token.balanceOf(rebalancer);
         uint256 receiverTokensAfter = token.balanceOf(receiver);
 
+        // depositor should not have received any tokens
+        assertEq(depositorTokensAfter, 0);
+
         int256 userTokensDelta = int256(userTokensAfter) - int256(userTokensBefore);
         int256 depositorTokensDelta = int256(depositorTokensAfter) - int256(depositorTokensBefore);
-        int256 rebalancerTokensDelta = int256(rebalancerTokensAfter) - int256(rebalancerTokensBefore);
+        int256 rebalancerTokensDelta =
+            int256(rebalancerTokensAfter) - int256(rebalancerTokensBefore);
         int256 receiverTokensDelta = int256(receiverTokensAfter) - int256(receiverTokensBefore);
 
         int256 rebalancerProfit = rebalancerTokensDelta + rebalancerDelta;
 
-        console.log("user eth delta", userDelta);
-        console.log("user tokens delta", userTokensDelta);
+        // user should not have paid neither received any eth
+        assertEq(userDelta, 0);
 
-        console.log("user tx cost (1eth=1token)", -userTokensDelta - 1e18);
+        // console.log("user eth delta", userDelta);
+        console.log("user tokens delta", userTokensDelta + 1e18);
 
         // console.log("receiver tokens delta", receiverTokensDelta);
 
         console.log("depositor eth delta (profit)", depositorDelta);
-        console.log("depositor tokens delta", depositorTokensDelta);
+        // console.log("depositor tokens delta", depositorTokensDelta);
 
         // console.log("rebalancer eth delta", rebalancerDelta);
         // console.log("rebalancer tokens delta", rebalancerTokensDelta);

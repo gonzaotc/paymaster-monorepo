@@ -2,7 +2,10 @@
 pragma solidity ^0.8.26;
 
 // External
-import {ERC4337Utils, PackedUserOperation} from "@openzeppelin/contracts/account/utils/draft-ERC4337Utils.sol";
+import {
+    ERC4337Utils,
+    PackedUserOperation
+} from "@openzeppelin/contracts/account/utils/draft-ERC4337Utils.sol";
 import {IEntryPoint} from "@openzeppelin/contracts/interfaces/draft-IERC4337.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -11,15 +14,31 @@ import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {MinimalPaymasterCore} from "./MinimalPaymasterCore.sol";
 import {ERC6909NativeEntryPointVault} from "./ERC6909NativeEntryPointVault.sol";
 import {IOracle} from "./IOracle.sol";
-import {console} from "forge-std/console.sol";
 
 contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVault {
     using ERC4337Utils for PackedUserOperation;
     using SafeERC20 for IERC20;
     using Math for *;
 
+    struct Pool {
+        address token;
+        address oracle;
+        // the pool fee is expressed in basis points (bps)
+        // i.e: 100 bps = 1%
+        //
+        // to be done: the pool fee should be a relationship between the token reserves and the eth reserves.
+        // A kind of bounding curve must be implemented where:
+        // When ethReserves are zero, the fee is maximum (e.g 5%)
+        // When tokenReserves are zero, the fee is minimum (e.g 0.1%)
+        //
+        uint24 rebalancingFeeBps;
+        // the pool LP fee is expressed in basis points (bps)
+        // i.e: 100 bps = 1%
+        uint24 lpFeeBps;
+    }
+
     // emitted when a new pool is initialized
-    event PoolInitialized(address token, address oracle);
+    event PoolInitialized(address token, address oracle, uint24 lpFeeBps, uint24 rebalancingFeeBps);
 
     // emitted when a pool is rebalanced
     event PoolRebalanced(address token, uint256 ethAmount, uint256 tokenAmount);
@@ -31,55 +50,69 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
     error PoolNotInitialized(address token);
 
     // thrown when a pool does not have enough eth reserves
-    error PoolNotEnoughEthReserves(address token);
+    error PoolNotEnoughEthReserves(uint256 ethRequired);
 
     // thrown when a pool does not have enough token reserves
-    error PoolNotEnoughTokenReserves(address token);
+    error PoolNotEnoughTokenReserves(uint256 tokensRequired);
 
     // thrown when an invalid oracle is provided
     error InvalidOracle(address oracle);
 
+    // thrown when an invalid pool fee configuration is provided
+    error InvalidPoolFeeBps(uint24 lpFeeBps, uint24 rebalancingFeeBps);
+
     // thrown when not enough eth is sent
-    error NotEnoughEthSent(address token);
+    error NotEnoughEthSent(uint256 ethSent, uint256 ethRequired);
 
     // mapping of token to oracle
-    mapping(address token => IOracle oracle) oracles;
+    mapping(address token => Pool pool) pools;
 
     // initializes a new pool for a given token and oracle
     // NOTE: In the current version, only one pool can be initialized for a given token.
-    function initializePool(address token, address oracle) public {
-        require(oracles[token] == IOracle(address(0)), PoolAlreadyInitialized(token));
+    function initializePool(
+        address token,
+        uint24 lpFeeBps,
+        uint24 rebalancingFeeBps,
+        address oracle
+    ) public {
+        require(pools[token].oracle == address(0), PoolAlreadyInitialized(token));
         require(oracle != address(0), InvalidOracle(oracle));
-        oracles[token] = IOracle(oracle);
+        require(
+            lpFeeBps > 0 && rebalancingFeeBps > 0 && lpFeeBps + rebalancingFeeBps <= 10000,
+            InvalidPoolFeeBps(lpFeeBps, rebalancingFeeBps)
+        );
 
-        emit PoolInitialized(token, oracle);
+        pools[token].oracle = oracle;
+        pools[token].lpFeeBps = lpFeeBps;
+        pools[token].rebalancingFeeBps = rebalancingFeeBps;
+
+        emit PoolInitialized(token, oracle, lpFeeBps, rebalancingFeeBps);
     }
 
-    function _validatePaymasterUserOp(PackedUserOperation calldata userOp, bytes32, uint256 maxCost)
-        internal
-        virtual
-        override
-        returns (bytes memory context, uint256 validationData)
-    {
+    function _validatePaymasterUserOp(
+        PackedUserOperation calldata userOp,
+        bytes32,
+        uint256 maxCost
+    ) internal virtual override returns (bytes memory context, uint256 validationData) {
         // 1. decode the token from the paymaster data
         (address token) = abi.decode(userOp.paymasterData(), (address));
 
         // 2. verify the pool is initialized
-        IOracle oracle = oracles[token];
-        require(address(oracle) != address(0), PoolNotInitialized(token));
+        Pool memory pool = pools[token];
+        require(pool.oracle != address(0), PoolNotInitialized(token));
 
         // 3. verify the pool has enough eth reserves
-        require(getPoolEthReserves(token) >= maxCost, PoolNotEnoughEthReserves(token));
+        require(getPoolEthReserves(token) >= maxCost, PoolNotEnoughEthReserves(maxCost));
 
         // 4. query the token price from oracle
-        uint256 tokenPriceInEth = oracle.getTokenPriceInEth();
+        uint256 tokenPriceInEth = IOracle(pool.oracle).getTokenPriceInEth();
 
         // 5. query the fees in basis points for the token pool
-        uint24 feesBps = getPoolFeesBps(token);
+        uint24 feesBps = pool.lpFeeBps + pool.rebalancingFeeBps;
 
         // 6. calculate the prefund amount
-        uint256 prefund = _erc20Cost(maxCost, userOp.maxFeePerGas(), tokenPriceInEth, feesBps);
-        console.log("prefund in tokens: ", prefund);
+        uint256 gasCost = _gasCost(maxCost, userOp.maxFeePerGas());
+        uint256 prefund = _erc20Cost(gasCost, tokenPriceInEth, feesBps);
 
         // 7. attempt to transfer the prefund amount from the user to the paymaster
         bool prefunded = IERC20(token).trySafeTransferFrom(userOp.sender, address(this), prefund);
@@ -93,47 +126,55 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         return (context, validationData);
     }
 
-    function _postOp(PostOpMode, bytes calldata context, uint256 actualGasCost, uint256 actualUserOpFeePerGas)
-        internal
-        virtual
-        override
-    {
+    function _postOp(
+        PostOpMode,
+        bytes calldata context,
+        uint256 actualGasCost,
+        uint256 actualUserOpFeePerGas
+    ) internal virtual override {
         // 1. decode the context for the `postOp` function
         (address sender, address token, uint256 tokenPriceInEth, uint256 feesBps, uint256 prefund) =
             abi.decode(context, (address, address, uint256, uint256, uint256));
 
         // 2. convert from gas amount to token amount
-        uint256 actualTokenAmount = _erc20Cost(actualGasCost, actualUserOpFeePerGas, tokenPriceInEth, feesBps);
-        console.log("actualTokenAmount: ", actualTokenAmount);
+        uint256 actualGasCostInEth = _gasCost(actualGasCost, actualUserOpFeePerGas);
+        uint256 actualTokenAmount = _erc20Cost(actualGasCostInEth, tokenPriceInEth, feesBps);
 
         // 2. transfer the excess token amount to the user
         // @TODO: optional optimization: only send the excess if its value is larger than the cost of sending them
         uint256 excessTokenAmount = prefund - actualTokenAmount;
-        console.log("refund in tokens: ", excessTokenAmount);
         if (excessTokenAmount > 0) IERC20(token).safeTransfer(sender, excessTokenAmount);
 
         // track the gas spent in the token pool
-        _decreaseAssets(uint256(uint160(token)), _gasCost(actualGasCost, actualUserOpFeePerGas));
+        // @TODO: there is a potential issue here:
+        // We are approximating `actualGasCostInEth` by approximating `postOpCost`,
+        // which is unknown at this point, and may unsynchonize the assets of the token pool.
+        // this de-synchronization may cause the paymaster to think this userOp decreased the deposited eth
+        // by more or less than it did.
+        _decreaseAssets(uint256(uint160(token)), actualGasCostInEth);
     }
 
     /// @dev Calculates the cost of the user operation in ETH.
-    /// @param cost The cost of the user operation in ETH.
-    /// @param feePerGas The fee per gas of the user operation.
+    /// @param gasCost The cost of the user operation in ETH.
     /// @param tokenPrice The price of the token in ETH.
     /// @param feesBps The fees in basis points. i.e 100bps = 1%
     /// @return erc20CostWithFees The cost of the user operation in the token, including fees.
-    function _erc20Cost(uint256 cost, uint256 feePerGas, uint256 tokenPrice, uint256 feesBps)
+    function _erc20Cost(uint256 gasCost, uint256 tokenPrice, uint256 feesBps)
         internal
         view
         virtual
         returns (uint256 erc20CostWithFees)
     {
-        uint256 gasCost = _gasCost(cost, feePerGas);
         uint256 baseErc20Cost = gasCost.mulDiv(tokenPrice, _tokenPriceDenominator());
         erc20CostWithFees = baseErc20Cost + (baseErc20Cost * feesBps / 10000);
     }
 
-    function _gasCost(uint256 cost, uint256 feePerGas) internal view virtual returns (uint256 gasCost) {
+    function _gasCost(uint256 cost, uint256 feePerGas)
+        internal
+        view
+        virtual
+        returns (uint256 gasCost)
+    {
         return (cost + _postOpCost() * feePerGas);
     }
 
@@ -144,7 +185,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
 
     /// @dev Over-estimates the cost of the post-operation logic
     function _postOpCost() internal pure returns (uint256) {
-        return 50_000;
+        return 20_000;
     }
 
     // allows anyone to rebalance the pool by buying tokens for eth at a discount price
@@ -155,26 +196,25 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         returns (uint256 ethAmountAfterDiscount)
     {
         // 1. get the oracle and validate the pool exists
-        IOracle oracle = oracles[token];
-        require(address(oracle) != address(0), PoolNotInitialized(token));
+        Pool memory pool = pools[token];
+        require(pool.oracle != address(0), PoolNotInitialized(token));
 
         // 2. validate the pool has enough tokenAmount to sell
-        require(getPoolTokenReserves(token) >= tokenAmount, PoolNotEnoughTokenReserves(token));
+        require(getPoolTokenReserves(token) >= tokenAmount, PoolNotEnoughTokenReserves(tokenAmount));
 
         // 3. query the token price from oracle
-        uint256 tokenPriceInEth = oracle.getTokenPriceInEth();
+        uint256 tokenPriceInEth = IOracle(pool.oracle).getTokenPriceInEth();
 
         // 4. calculate the eth amount for buying the token amount
         uint256 ethAmount = tokenAmount * tokenPriceInEth / 1e18;
 
-        // 5. get the rebalancing discount in basis points
-        uint256 rebalancingDiscountBps = getRebalancingFee(token);
-
         // 6. calculate the eth amount after the rebalancing discount
-        ethAmountAfterDiscount = ethAmount - (ethAmount * rebalancingDiscountBps / 10000);
+        ethAmountAfterDiscount = ethAmount - (ethAmount * pool.rebalancingFeeBps / 10000);
 
         // 7. validate the msg.value amount is enough to cover the eth amount after the rebalancing discount
-        require(msg.value >= ethAmountAfterDiscount, NotEnoughEthSent(token));
+        require(
+            msg.value >= ethAmountAfterDiscount, NotEnoughEthSent(msg.value, ethAmountAfterDiscount)
+        );
 
         // 10. track the eth added to the pool
         _increaseAssets(uint256(uint160(token)), ethAmountAfterDiscount);
@@ -201,30 +241,6 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
     // returns the current token reserves for a given token pool
     function getPoolTokenReserves(address token) public view returns (uint256 tokenReserves) {
         return IERC20(token).balanceOf(address(this));
-    }
-
-    // returns the current fees in basis points for a given token pool
-    function getPoolFeesBps(address token) public pure returns (uint24 feesBps) {
-        return getRebalancingFee(token) + getLPFee(token);
-    }
-
-    // the pool fee is expressed in basis points (bps)
-    // i.e: 100 bps = 1%
-    //
-    // to be done: the pool fee should be a relationship between the token reserves and the eth reserves.
-    // A kind of bounding curve must be implemented where:
-    // When ethReserves are zero, the fee is maximum (e.g 5%)
-    // When tokenReserves are zero, the fee is minimum (e.g 0.1%)
-    //
-    function getRebalancingFee(address token) public pure returns (uint24 feeBps) {
-        return 100;
-    }
-
-    // the pool LP fee is expressed in basis points (bps)
-    // i.e: 100 bps = 1%
-    //
-    function getLPFee(address token) public pure returns (uint24 feeBps) {
-        return 100;
     }
 
     // required override by Solidity
