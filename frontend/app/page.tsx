@@ -1,3 +1,99 @@
+import { PoolAnalyticsShell } from '@/components/pool-analytics-shell';
+
+const stats = [
+  { label: 'Network TVL', value: '$75.4M', change: '+12.1% vs last week' },
+  { label: 'Avg. APR', value: '5.8%', change: 'Blended across active pools' },
+  {
+    label: 'Daily Volume',
+    value: '$14.2M',
+    change: 'Across 42 supported assets',
+  },
+  { label: 'Rebalances', value: '278', change: 'Automations in the last 24h' },
+];
+
+const panelClass =
+  'rounded-[2rem] border border-white/80 bg-white/95 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-8';
+
+async function deposit(formData: FormData) {
+  'use server';
+  console.log('Queue rebalance for', formData.get('poolId'));
+}
+
+async function withdraw(formData: FormData) {
+  'use server';
+  console.log('Pause automation for', formData.get('poolId'));
+}
+
+const poolActions = [
+  {
+    label: 'Deposit',
+    description: 'Add capital to boost this pool’s available liquidity.',
+    action: deposit,
+  },
+  {
+    label: 'Withdraw',
+    description: 'Unwind capital from the pool back to treasury control.',
+    action: withdraw,
+    variant: 'ghost' as const,
+  },
+];
+
 export default function Home() {
-  return <div></div>;
+  return (
+    <main className="min-h-screen">
+      <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-8">
+        <header className="text-center">
+          <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
+            Universal Paymaster
+          </p>
+        </header>
+
+        <section className={`${panelClass} space-y-6`}>
+          <div className="flex flex-col gap-2 text-center sm:text-left">
+            <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
+              KPI overview
+            </p>
+            <h2 className="text-2xl font-semibold text-slate-900">
+              Network pulse
+            </h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {stats.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-[1.25rem] border border-white/90 bg-white p-4 shadow-[0_12px_40px_rgba(15,23,42,0.06)]">
+                <p className="text-xs font-medium uppercase tracking-[0.4em] text-slate-400">
+                  {stat.label}
+                </p>
+                <p className="mt-3 text-2xl font-semibold text-slate-900">
+                  {stat.value}
+                </p>
+                <p className="text-sm text-slate-500">{stat.change}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="space-y-6">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
+                Pools
+              </p>
+            </div>
+
+            <div className="flex gap-2 text-sm text-slate-500">
+              <span className="rounded-full bg-white/95 px-4 py-2 shadow-sm">
+                Live
+              </span>
+              <span className="rounded-full border border-slate-200/80 bg-white px-4 py-2">
+                Last 7 days
+              </span>
+            </div>
+          </div>
+          <PoolAnalyticsShell actions={poolActions} />
+        </section>
+      </div>
+    </main>
+  );
 }
