@@ -8,19 +8,23 @@
   "workspaces": [
     "contracts",
     "sdk",
-    "integration"
+    "integration",
+    "frotend"
   ],
   "scripts": {
     "build": "pnpm -r --filter='!paymaster-integration' build",
     "build:contracts": "pnpm --filter paymaster-contracts build",
     "build:sdk": "pnpm --filter paymaster-sdk build",
+    "build:frontend": "pnpm --filter paymaster-frontend build",
     "test": "pnpm -r test",
     "test:contracts": "pnpm --filter paymaster-contracts test",
     "test:sdk": "pnpm --filter paymaster-sdk test",
+    "test:frontend": "pnpm --filter paymaster-frontend test",
     "test:integration": "pnpm --filter paymaster-integration test",
     "lint": "pnpm -r lint",
     "lint:contracts": "pnpm --filter paymaster-contracts lint",
     "lint:sdk": "pnpm --filter paymaster-sdk lint",
+    "lint:frontend": "pnpm --filter paymaster-frontend lint",
     "lint:integration": "pnpm --filter paymaster-integration lint",
     "clean": "pnpm -r clean",
     "dev:sdk": "pnpm --filter paymaster-sdk dev"
