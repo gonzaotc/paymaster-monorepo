@@ -471,7 +471,7 @@ export function TransferForm() {
                   aria-label={buttonLabel}
                   disabled={buttonDisabled}
                   className={[
-                    'relative inline-flex h-12 w-full items-center justify-center overflow-hidden rounded-full border text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.25)] transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900',
+                    'relative inline-flex h-12 w-full items-center justify-center overflow-hidden rounded-full border text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.25)] transition focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-slate-900',
                     buttonToneClass,
                     showHalo ? buttonHaloTone : '',
                     buttonMotionClass,

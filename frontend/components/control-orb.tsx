@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useId, useRef, useState } from 'react';
-import type { ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { MiniOrb } from './mini-orb';
 import type { MiniOrbOption } from './mini-orb';
