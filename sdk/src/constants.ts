@@ -9,7 +9,7 @@ export const ENTRYPOINT_V08_ADDRESS: Address = '0x4337084d9e255ff0702461cf8895ce
 /**
  * Universal Paymaster address
  */
-export const PAYMASTER_ADDRESS: Address = '0x3BA9A96eE3eFf3A69E2B18886AcF52027EFF8966';
+export const PAYMASTER_ADDRESS: Address = '0x86eccb505182116da82934d2e5156a35c8a18ab5';
 
 /**
  * Oracle address

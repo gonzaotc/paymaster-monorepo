@@ -17,17 +17,17 @@ async function main() {
 		client: { public: publicClient, wallet: deployer },
 	});
 
-    const tokensReserve = await paymasterContract.read.getPoolTokenReserves([chainConfig.USDC]);
-    console.log('tokens reserve: ', tokensReserve);
+	const tokensReserve = await paymasterContract.read.getPoolTokenReserves([chainConfig.USDC]);
+	console.log('tokens reserve: ', tokensReserve);
 
-    if (tokensReserve === 0n) {
-        console.error('tokens reserve is 0');
-        return;
-    }
-    
-    // @TO-DO: a quoting mechanism to know the exact amount of eth to send
-    // for now, we know that the token-to-eth ratio is 1:1, so we send the
-    // exact amount of eth as the token reserve
+	if (tokensReserve === 0n) {
+		console.error('tokens reserve is 0');
+		return;
+	}
+
+	// @TO-DO: a quoting mechanism to know the exact amount of eth to send
+	// for now, we know that the token-to-eth ratio is 1:1, so we send the
+	// exact amount of eth as the token reserve
 	const ethAmountPaid = await paymasterContract.write.rebalance(
 		[chainConfig.USDC, tokensReserve, chainConfig.REBALANCER_ADDRESS],
 		{ value: tokensReserve }

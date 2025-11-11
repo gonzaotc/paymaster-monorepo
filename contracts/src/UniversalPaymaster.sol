@@ -2,10 +2,7 @@
 pragma solidity ^0.8.26;
 
 // External
-import {
-    ERC4337Utils,
-    PackedUserOperation
-} from "@openzeppelin/contracts/account/utils/draft-ERC4337Utils.sol";
+import {ERC4337Utils, PackedUserOperation} from "@openzeppelin/contracts/account/utils/draft-ERC4337Utils.sol";
 import {IEntryPoint} from "@openzeppelin/contracts/interfaces/draft-IERC4337.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import {SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
@@ -72,12 +69,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
 
     // initializes a new pool for a given token and oracle
     // NOTE: In the current version, only one pool can be initialized for a given token.
-    function initializePool(
-        address token,
-        uint24 lpFeeBps,
-        uint24 rebalancingFeeBps,
-        address oracle
-    ) public {
+    function initializePool(address token, uint24 lpFeeBps, uint24 rebalancingFeeBps, address oracle) public {
         require(pools[token].oracle == address(0), PoolAlreadyInitialized(token));
         require(oracle != address(0), InvalidOracle(oracle));
         require(
@@ -93,11 +85,12 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         emit PoolInitialized(token, oracle, lpFeeBps, rebalancingFeeBps);
     }
 
-    function _validatePaymasterUserOp(
-        PackedUserOperation calldata userOp,
-        bytes32,
-        uint256 maxCost
-    ) internal virtual override returns (bytes memory context, uint256 validationData) {
+    function _validatePaymasterUserOp(PackedUserOperation calldata userOp, bytes32, uint256 maxCost)
+        internal
+        virtual
+        override
+        returns (bytes memory context, uint256 validationData)
+    {
         // 1. decode the token from the paymaster data
         (address token) = abi.decode(userOp.paymasterData(), (address));
 
@@ -130,12 +123,11 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         return (context, validationData);
     }
 
-    function _postOp(
-        PostOpMode,
-        bytes calldata context,
-        uint256 actualGasCost,
-        uint256 actualUserOpFeePerGas
-    ) internal virtual override {
+    function _postOp(PostOpMode, bytes calldata context, uint256 actualGasCost, uint256 actualUserOpFeePerGas)
+        internal
+        virtual
+        override
+    {
         // 1. decode the context for the `postOp` function
         (address sender, address token, uint256 tokenPriceInEth, uint256 feesBps, uint256 prefund) =
             abi.decode(context, (address, address, uint256, uint256, uint256));
@@ -173,12 +165,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         erc20CostWithFees = baseErc20Cost + (baseErc20Cost * feesBps / 10000);
     }
 
-    function _gasCost(uint256 cost, uint256 feePerGas)
-        internal
-        view
-        virtual
-        returns (uint256 gasCost)
-    {
+    function _gasCost(uint256 cost, uint256 feePerGas) internal view virtual returns (uint256 gasCost) {
         return (cost + _postOpCost() * feePerGas);
     }
 
@@ -200,7 +187,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         returns (uint256 ethAmountAfterDiscount)
     {
         require(tokenAmount > 0, InvalidAmount(tokenAmount));
-        
+
         // 1. get the oracle and validate the pool exists
         Pool memory pool = pools[token];
         require(pool.oracle != address(0), PoolNotInitialized(token));
@@ -218,9 +205,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         ethAmountAfterDiscount = ethAmount - (ethAmount * pool.rebalancingFeeBps / 10000);
 
         // 7. validate the msg.value amount is enough to cover the eth amount after the rebalancing discount
-        require(
-            msg.value >= ethAmountAfterDiscount, NotEnoughEthSent(msg.value, ethAmountAfterDiscount)
-        );
+        require(msg.value >= ethAmountAfterDiscount, NotEnoughEthSent(msg.value, ethAmountAfterDiscount));
 
         // 10. track the eth added to the pool
         _increaseAssets(uint256(uint160(token)), ethAmountAfterDiscount);
