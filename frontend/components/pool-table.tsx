@@ -93,12 +93,12 @@ const parsePercent = (value: string) =>
   Number(value.replace(/[^0-9.]/g, '')) || 0;
 
 const tokenIcons: Record<string, { src: string; alt: string }> = {
-  ETH: { src: '/eth.svg', alt: 'Ethereum' },
-  USDC: { src: '/usdc.svg', alt: 'USD Coin' },
-  USDT: { src: '/usdt.svg', alt: 'Tether' },
-  DAI: { src: '/dai.svg', alt: 'Dai' },
-  WBTC: { src: '/bitcoin.svg', alt: 'Wrapped Bitcoin' },
-  BTC: { src: '/bitcoin.svg', alt: 'Bitcoin' },
+  ETH: { src: '/svg/eth.svg', alt: 'Ethereum' },
+  USDC: { src: '/svg/usdc.svg', alt: 'USD Coin' },
+  USDT: { src: '/svg/usdt.svg', alt: 'Tether' },
+  DAI: { src: '/svg/dai.svg', alt: 'Dai' },
+  WBTC: { src: '/svg/bitcoin.svg', alt: 'Wrapped Bitcoin' },
+  BTC: { src: '/svg/bitcoin.svg', alt: 'Bitcoin' },
 };
 
 const tokenBaseStyle = {
