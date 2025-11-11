@@ -1,4 +1,3 @@
-import { PasskeyStatusPanel } from '@/components/passkey-status-panel';
 import { PoolSection } from '@/components/pool-section';
 
 const stats = [
@@ -40,17 +39,9 @@ const poolActions = [
 ];
 
 export default function Home() {
-  const privyEnabled = Boolean(process.env.NEXT_PUBLIC_PRIVY_APP_ID);
-
   return (
     <main className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-8">
-        {/* <header className="text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
-            Universal Paymaster
-          </p>
-        </header> */}
-
         <section className={`${panelClass} space-y-6`}>
           <div className="flex flex-col gap-2 text-center sm:text-left">
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">

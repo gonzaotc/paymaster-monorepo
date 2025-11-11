@@ -1,3 +1,4 @@
+import { AppHeader } from '@/components/app-header';
 import { TransferForm } from '@/components/transfer-form';
 
 const panelClass =
@@ -7,11 +8,7 @@ export default function TransferPage() {
   return (
     <main className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-8">
-        <header className="space-y-2 text-center">
-          <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
-            Universal Paymaster
-          </p>
-        </header>
+        <AppHeader className="space-y-2" />
 
         <section className={`${panelClass} space-y-8`}>
           <div className="space-y-2 text-center sm:text-left">
