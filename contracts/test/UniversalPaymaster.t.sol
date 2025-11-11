@@ -75,10 +75,7 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
 
     function setUp() public {
         // deploy the entrypoint
-        deployCodeTo(
-            "account-abstraction/contracts/core/EntryPoint.sol",
-            address(ERC4337Utils.ENTRYPOINT_V08)
-        );
+        deployCodeTo("account-abstraction/contracts/core/EntryPoint.sol", address(ERC4337Utils.ENTRYPOINT_V08));
         entryPoint = EntryPoint(payable(address(ERC4337Utils.ENTRYPOINT_V08)));
 
         // deploy the paymaster
@@ -117,16 +114,14 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
     // EIP-7702 tests require Foundry nightly with Vm.SignedDelegation support
     function test_eip7702_delegation() public {
         assertEq(address(EOA).code.length, 0);
-        Vm.SignedDelegation memory signedDelegation =
-            vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
         bytes memory expectedCode = abi.encodePacked(hex"ef0100", address(account));
         assertEq(address(EOA).code, expectedCode);
     }
 
     function test_ERC1271_signature() public {
-        Vm.SignedDelegation memory signedDelegation =
-            vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
         string memory text = "Hello, world!";
         bytes32 hash = keccak256(abi.encodePacked("\x19Ethereum Signed Message:\n13", text));
@@ -178,8 +173,7 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
         assertEq(token.allowance(EOA, address(paymaster)), type(uint256).max);
 
         // 2. Delegate to the account
-        Vm.SignedDelegation memory signedDelegation =
-            vm.signDelegation(address(account), EOAPrivateKey);
+        Vm.SignedDelegation memory signedDelegation = vm.signDelegation(address(account), EOAPrivateKey);
         vm.attachDelegation(signedDelegation);
 
         GasConfiguration memory gasConfig = GasConfiguration({
@@ -247,11 +241,7 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
             int256(entryPointDepositAfterSponsoring) - int256(depositorAssetsAfterSponsoring);
         console.log("entry point vs depositor delta: ", entryPointVsDepositorDelta);
 
-        assertEq(
-            depositorAssetsAfterSponsoring,
-            totalAssetsAfterSponsoring,
-            "depositor assets != total assets"
-        );
+        assertEq(depositorAssetsAfterSponsoring, totalAssetsAfterSponsoring, "depositor assets != total assets");
         assertApproxEqAbs(
             entryPointDepositAfterSponsoring,
             depositorAssetsAfterSponsoring,
@@ -271,11 +261,7 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
         // 9. Depositor withdraws their eth
         uint256 depositorAssets = paymaster.maxWithdraw(depositor, tokenId);
         uint256 totalAssets = paymaster.totalAssets(tokenId);
-        assertGe(
-            totalAssets,
-            depositorAssets,
-            "total assets should be greater than or equal to depositor assets"
-        );
+        assertGe(totalAssets, depositorAssets, "total assets should be greater than or equal to depositor assets");
         assertEq(
             depositorAssets,
             totalAssets - 1,
@@ -308,8 +294,7 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
 
         int256 userTokensDelta = int256(userTokensAfter) - int256(userTokensBefore);
         int256 depositorTokensDelta = int256(depositorTokensAfter) - int256(depositorTokensBefore);
-        int256 rebalancerTokensDelta =
-            int256(rebalancerTokensAfter) - int256(rebalancerTokensBefore);
+        int256 rebalancerTokensDelta = int256(rebalancerTokensAfter) - int256(rebalancerTokensBefore);
         int256 receiverTokensDelta = int256(receiverTokensAfter) - int256(receiverTokensBefore);
 
         int256 rebalancerProfit = rebalancerTokensDelta + rebalancerDelta;

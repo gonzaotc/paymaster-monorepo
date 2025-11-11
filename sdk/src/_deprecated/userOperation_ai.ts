@@ -2,7 +2,7 @@ import type { Address, Hex, Client } from 'viem';
 import { encodeFunctionData } from 'viem';
 
 /**
- * Parameters for building a UserOperation with UniswapPaymaster
+ * Parameters for building a UserOperation with UniversalPaymaster
  */
 export type BuildUserOperationParams = {
 	sender: Address;

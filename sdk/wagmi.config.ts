@@ -8,11 +8,12 @@ export default defineConfig({
     foundry({
       project: "../contracts",
       include: [
-        "UniswapPaymaster.sol/**",
+        "UniversalPaymaster.sol/**",
+        "ERC6909NativeEntryPointVault.sol/**",
         "MinimalPaymasterCore.sol/**",
-        "EntryPointVault.sol/**",
-        "PoolManager.sol/**",
-        "StateView.sol/**",
+        "Oracle.sol/**",
+        "IEntryPoint.sol/**",
+        "EntryPoint.sol/**",
       ],
     }),
   ],
