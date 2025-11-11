@@ -1,5 +1,6 @@
 import hre from 'hardhat';
-import { universalPaymasterAbi } from 'paymaster-sdk';
+import { oracleAbi } from 'paymaster-sdk';
+import { parseEther } from 'viem';
 import { loadForgeArtifact } from '../src/helpers';
 
 /**
@@ -9,12 +10,12 @@ async function main() {
 	const [deployer] = await hre.viem.getWalletClients();
 	const publicClient = await hre.viem.getPublicClient();
 
-	const { bytecode } = loadForgeArtifact('UniversalPaymaster');
+	const { bytecode } = loadForgeArtifact('Oracle');
 
 	const hash = await deployer.deployContract({
-		abi: universalPaymasterAbi,
+		abi: oracleAbi,
 		bytecode,
-		args: [],
+		args: [parseEther('1')],
 	});
 
 	console.log(`Transaction hash: ${hash}`);
@@ -28,7 +29,7 @@ async function main() {
 	}
 
 	console.log('\n✅ Deployment successful!');
-	console.log(`Paymaster address: ${receipt.contractAddress}`);
+	console.log(`Oracle address: ${receipt.contractAddress}`);
 	console.log(`Block number: ${receipt.blockNumber}`);
 	console.log(`Gas used: ${receipt.gasUsed}`);
 }

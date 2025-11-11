@@ -1,7 +1,7 @@
 import { Address, Hex } from "viem";
 import { config as dotenvConfig } from "dotenv";
 import { resolve } from "path";
-import { Chain, sepolia, unichainSepolia, mainnet } from "viem/chains";
+import { Chain, sepolia, mainnet } from "viem/chains";
 
 // Load environment variables from .env file
 dotenvConfig({ path: resolve(__dirname, "../.env") });
@@ -16,11 +16,11 @@ export type ChainConfig = {
     RPC_URL: string;
     BUNDLER_URL: string;
     //
+    ENTRY_POINT: Address;
+    //
     PAYMASTER: Address;
     //
-    POOL_MANAGER: Address;
-    STATE_VIEW: Address;
-    PERMIT2: Address;
+    ORACLE: Address;
     //
     USDC: Address;
     // 
@@ -44,37 +44,14 @@ export const chainConfig: Record<string, ChainConfig> = {
         RPC_URL: process.env.RPC_URL_SEPOLIA as string,
         BUNDLER_URL: process.env.BUNDLER_URL_SEPOLIA as string,
         //
+        ENTRY_POINT: process.env.ENTRY_POINT as unknown as Address,
+        //
         PAYMASTER: process.env.PAYMASTER_SEPOLIA as unknown as Address,
         //
-        POOL_MANAGER: process.env.POOL_MANAGER_SEPOLIA as unknown as Address,
-        STATE_VIEW: process.env.STATE_VIEW_SEPOLIA as unknown as Address,
-        PERMIT2: process.env.PERMIT2_SEPOLIA as unknown as Address,
+        ORACLE: process.env.ORACLE_SEPOLIA as unknown as Address,
         //
         USDC: process.env.USDC_SEPOLIA as unknown as Address,
         // 
-        USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
-        USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
-        //
-        DEPLOYER_PRIVATE_KEY: process.env.DEPLOYER_PRIVATE_KEY as unknown as Hex,
-        DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS as unknown as Address,
-        //
-        RECIPIENT_ADDRESS: process.env.RECIPIENT_ADDRESS as unknown as Address,
-    },
-    unichainSepolia: {
-        id: 1301,
-        name: 'unichainSepolia',
-        //
-        RPC_URL: process.env.RPC_URL_UNICHAIN_SEPOLIA as string,
-        BUNDLER_URL: process.env.BUNDLER_URL_UNICHAIN_SEPOLIA as string,
-        //
-        PAYMASTER: process.env.PAYMASTER_UNICHAIN_SEPOLIA as unknown as Address,
-        //
-        POOL_MANAGER: process.env.POOL_MANAGER_UNICHAIN_SEPOLIA as unknown as Address,
-        STATE_VIEW: process.env.STATE_VIEW_UNICHAIN_SEPOLIA as unknown as Address,
-        PERMIT2: process.env.PERMIT2_UNICHAIN_SEPOLIA as unknown as Address,
-        //
-        USDC: process.env.USDC_UNICHAIN_SEPOLIA as unknown as Address,
-        //
         USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
         USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
         //
@@ -90,11 +67,11 @@ export const chainConfig: Record<string, ChainConfig> = {
         RPC_URL: process.env.RPC_URL_MAINNET as string,
         BUNDLER_URL: process.env.BUNDLER_URL_MAINNET as string,
         //
+        ENTRY_POINT: process.env.ENTRY_POINT as unknown as Address,
+        //
         PAYMASTER: process.env.PAYMASTER_MAINNET as unknown as Address,
         //
-        POOL_MANAGER: process.env.POOL_MANAGER_MAINNET as unknown as Address,
-        STATE_VIEW: process.env.STATE_VIEW_MAINNET as unknown as Address,
-        PERMIT2: process.env.PERMIT2_MAINNET as unknown as Address,
+        ORACLE: process.env.ORACLE_MAINNET as unknown as Address,
         //
         USDC: process.env.USDC_MAINNET as unknown as Address,
         //
@@ -132,10 +109,9 @@ export const getChainConfig = (): [ChainConfig, Chain] => {
         name: null, // not an env var
         RPC_URL: `RPC_URL_${chainSuffix}`,
         BUNDLER_URL: `BUNDLER_URL_${chainSuffix}`,
+        ENTRY_POINT: `ENTRY_POINT`,
         PAYMASTER: `PAYMASTER_${chainSuffix}`,
-        POOL_MANAGER: `POOL_MANAGER_${chainSuffix}`,
-        STATE_VIEW: `STATE_VIEW_${chainSuffix}`,
-        PERMIT2: `PERMIT2_${chainSuffix}`,
+        ORACLE: `ORACLE_${chainSuffix}`,
         USDC: `USDC_${chainSuffix}`,
         USER_PRIVATE_KEY: 'USER_PRIVATE_KEY',
         USER_ADDRESS: 'USER_ADDRESS',
@@ -165,8 +141,6 @@ function getChain(name: string): Chain {
     switch (name) {
         case 'sepolia':
             return sepolia;
-        case 'unichainSepolia':
-            return unichainSepolia;
         case 'mainnet':
             return mainnet;
     }

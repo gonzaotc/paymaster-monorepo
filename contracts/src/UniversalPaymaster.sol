@@ -65,7 +65,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
     error NotEnoughEthSent(uint256 ethSent, uint256 ethRequired);
 
     // mapping of token to oracle
-    mapping(address token => Pool pool) pools;
+    mapping(address token => Pool pool) public pools;
 
     // initializes a new pool for a given token and oracle
     // NOTE: In the current version, only one pool can be initialized for a given token.
@@ -82,6 +82,7 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
             InvalidPoolFeeBps(lpFeeBps, rebalancingFeeBps)
         );
 
+        pools[token].token = token;
         pools[token].oracle = oracle;
         pools[token].lpFeeBps = lpFeeBps;
         pools[token].rebalancingFeeBps = rebalancingFeeBps;

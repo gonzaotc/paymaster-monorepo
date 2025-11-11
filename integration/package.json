@@ -6,7 +6,7 @@
   "license": "MIT",
   "author": "gonzaotc",
   "scripts": {
-    "build": "cd ../sdk && npm run build && cd ../integration",
+    "build": "cd ../contracts && forge build && cd ../sdk && npm run build && cd ../integration",
     "test": "hardhat test",
     "test:watch": "hardhat watch test",
     "compile": "hardhat compile",
@@ -14,6 +14,10 @@
     "node": "hardhat node",
     "lint": "prettier --write test/ && eslint test/",
     "deploy-paymaster": "hardhat run scripts/deployPaymaster.ts",
+    "deploy-oracle": "hardhat run scripts/deployOracle.ts",
+    "create-pool": "hardhat run scripts/createPool.ts",
+    "deposit": "hardhat run scripts/deposit.ts",
+    "query-pool": "hardhat run scripts/queryPool.ts",
     "send-user-op": "hardhat run scripts/sendUserOp.ts",
     "send-sponsored-user-op": "hardhat run scripts/sendSponsoredUserOp.ts"
   },

@@ -2,7 +2,7 @@
   "name": "paymaster-monorepo",
   "version": "0.1.0",
   "private": true,
-  "description": "UniswapPaymaster monorepo - smart contracts, SDK, and integration tests",
+  "description": "UniversalPaymaster monorepo - smart contracts, SDK, and integration tests",
   "license": "MIT",
   "author": "gonzaotc",
   "workspaces": [

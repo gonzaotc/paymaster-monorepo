@@ -1,9 +1,7 @@
-import { Address, createClient, http } from 'viem';
-import { uniswapV4, type PoolKey } from './uniswapV4.js';
-import { ADDRESS_ZERO } from './constants.js';
-import { getContract } from 'viem';
+import { Address, createClient, http} from 'viem';
 import { Chain } from 'viem/chains';
-import { stateViewAbi } from './generated/abis.js';
+import { ADDRESS_ZERO } from './constants.js';
+import { Pool } from './pool.js';
 
 export interface Router {
 	/**
@@ -13,35 +11,19 @@ export interface Router {
 	 * @param chain - The chain to find the pool on.
 	 * @returns The best pool for the given token and amount.
 	 */
-	findBestPoolKey(token: Address, amount: bigint, chain: Chain): Promise<PoolKey>;
+	findBestPoolKey(token: Address, amount: bigint, chain: Chain): Promise<Pool>;
 }
 
 export const router: Router = {
-	async findBestPoolKey(token: Address, amount: bigint, chain: Chain): Promise<PoolKey> {
+	async findBestPoolKey(token: Address, amount: bigint, chain: Chain): Promise<Pool> {
 		const client = createClient({ chain, transport: http() });
 
-		const bestPoolMock: PoolKey = {
-			currency0: ADDRESS_ZERO,
-			currency1: token,
-			fee: 3000, // 0.3%
-			tickSpacing: 60,
-			hooks: ADDRESS_ZERO,
+		const bestPoolMock: Pool = {
+			token: token,
+			oracle: ADDRESS_ZERO,
+			lpFeeBps: 100, // 1%
+			rebalancingFeeBps: 100, // 1%
 		};
-		console.log('bestPoolMock', bestPoolMock);
-
-		const poolId = uniswapV4.toId(bestPoolMock);
-		console.log('poolId', poolId);
-
-		const stateView = getContract({
-			// @TBD organize this in a better way
-			address: '0xc199f1072a74d4e905aba1a84d9a45e2546b6222' as Address,
-			abi: stateViewAbi,
-			client: { public: client },
-		});
-
-		const liquidity = await stateView.read.getLiquidity([poolId]);
-		console.log('liquidit in pool', liquidity);
-		if (Number(liquidity) <= 0) throw new Error('No liquidity found in determined pool');
 
 		return bestPoolMock;
 	},

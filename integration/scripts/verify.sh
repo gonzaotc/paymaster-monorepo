@@ -1,0 +1,1 @@
+forge verify-contract --verifier sourcify --chain 11155111 $PAYMASTER_ADDRESS  --rpc-url $RPC_URL_SEPOLIA

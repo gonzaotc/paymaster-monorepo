@@ -1,56 +1,17 @@
 import { encodeAbiParameters } from 'viem';
-import type { Hex } from 'viem';
-import type { PermitSingle } from '@gonzaotc/permit2-sdk-viem';
-import type { PoolKey } from './uniswapV4.js';
-
+import type { Address, Hex } from 'viem';
 export type PaymasterData = {
-	poolKey: PoolKey;
-	permit: PermitSingle;
-	signature: Hex;
+	token: Address;
 };
 
 export const paymaster = {
 	/**
-	 * Builds the paymaster data for the UniswapPaymaster contract.
+	 * Builds the paymaster data for the UniversalPaymaster contract.
 	 * @param params - The parameters for the paymaster data.
 	 * @returns The paymaster data.
 	 */
 	buildPaymasterData: (params: PaymasterData): Hex => {
-		const { poolKey, permit, signature } = params;
-		const paymasterData = encodeAbiParameters(
-			[
-				{
-					type: 'tuple',
-					components: [
-						{ name: 'currency0', type: 'address' },
-						{ name: 'currency1', type: 'address' },
-						{ name: 'fee', type: 'uint24' },
-						{ name: 'tickSpacing', type: 'int24' },
-						{ name: 'hooks', type: 'address' },
-					],
-				},
-				{
-					type: 'tuple',
-					components: [
-						{
-							name: 'details',
-							type: 'tuple',
-							components: [
-								{ name: 'token', type: 'address' },
-								{ name: 'amount', type: 'uint160' },
-								{ name: 'expiration', type: 'uint48' },
-								{ name: 'nonce', type: 'uint48' },
-							],
-						},
-						{ name: 'spender', type: 'address' },
-						{ name: 'sigDeadline', type: 'uint256' },
-					],
-				},
-				{ type: 'bytes' },
-			],
-			[poolKey, permit, signature]
-		);
-
-		return paymasterData;
+		const { token } = params;
+		return encodeAbiParameters([{ type: 'address' }], [token]);
 	},
 };
