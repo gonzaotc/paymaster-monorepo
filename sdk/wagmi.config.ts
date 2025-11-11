@@ -14,6 +14,7 @@ export default defineConfig({
         "Oracle.sol/**",
         "IEntryPoint.sol/**",
         "EntryPoint.sol/**",
+        "ERC20Mock.sol/**",
       ],
     }),
   ],

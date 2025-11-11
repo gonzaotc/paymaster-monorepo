@@ -23,6 +23,8 @@ export type ChainConfig = {
     ORACLE: Address;
     //
     USDC: Address;
+    //
+    FTC: Address;
     // 
     USER_PRIVATE_KEY: Hex;
     USER_ADDRESS: Address;
@@ -58,6 +60,8 @@ export const chainConfig: Record<string, ChainConfig> = {
         //
         USDC: process.env.USDC_SEPOLIA as unknown as Address,
         // 
+        FTC: process.env.FTC_SEPOLIA as unknown as Address,
+        //
         USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
         USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
         //
@@ -86,6 +90,8 @@ export const chainConfig: Record<string, ChainConfig> = {
         ORACLE: process.env.ORACLE_MAINNET as unknown as Address,
         //
         USDC: process.env.USDC_MAINNET as unknown as Address,
+        //
+        FTC: process.env.FTC_MAINNET as unknown as Address,
         //
         USER_PRIVATE_KEY: process.env.USER_PRIVATE_KEY as unknown as Hex,
         USER_ADDRESS: process.env.USER_ADDRESS as unknown as Address,
@@ -131,6 +137,7 @@ export const getChainConfig = (): [ChainConfig, Chain] => {
         PAYMASTER: `PAYMASTER_${chainSuffix}`,
         ORACLE: `ORACLE_${chainSuffix}`,
         USDC: `USDC_${chainSuffix}`,
+        FTC: `FTC_${chainSuffix}`,
         USER_PRIVATE_KEY: 'USER_PRIVATE_KEY',
         USER_ADDRESS: 'USER_ADDRESS',
         DEPLOYER_PRIVATE_KEY: 'DEPLOYER_PRIVATE_KEY',
