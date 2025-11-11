@@ -7,25 +7,32 @@ import { getChainConfig } from '../src/config';
  * Deploy the UniversalPaymaster contract to the selected chain
  */
 async function main() {
-    const [deployer] = await hre.viem.getWalletClients();
-    const [chainConfig, ] = getChainConfig();
-    const publicClient = await hre.viem.getPublicClient();
+	const [deployer] = await hre.viem.getWalletClients();
+	const [chainConfig] = getChainConfig();
+	const publicClient = await hre.viem.getPublicClient();
 
-    const paymasterContract = getContract({
-        address: chainConfig.PAYMASTER,
-        abi: universalPaymasterAbi,
-        client: { public: publicClient, wallet: deployer },
-    });
+	const paymasterContract = getContract({
+		address: chainConfig.PAYMASTER,
+		abi: universalPaymasterAbi,
+		client: { public: publicClient, wallet: deployer },
+	});
 
-    const tokenId = BigInt(chainConfig.USDC);
-    console.log('tokenId: ', tokenId);
+	const tokenId = BigInt(chainConfig.USDC);
+	console.log('tokenId: ', tokenId);
 
-    const withdrawAmount = await paymasterContract.read.maxWithdraw([chainConfig.DEPOSITOR_ADDRESS, tokenId]);
-    console.log('max withdraw amount: ', withdrawAmount);
+	const withdrawAmount = await paymasterContract.read.maxWithdraw([
+		chainConfig.DEPOSITOR_ADDRESS,
+		tokenId,
+	]);
+	console.log('max withdraw amount: ', withdrawAmount);
 
-    const burnedShares = await paymasterContract.write
-    .withdraw([withdrawAmount, chainConfig.DEPOSITOR_ADDRESS, chainConfig.DEPOSITOR_ADDRESS, tokenId]);
-    console.log('burned shares: ', burnedShares);
+	const burnedShares = await paymasterContract.write.withdraw([
+		withdrawAmount,
+		chainConfig.DEPOSITOR_ADDRESS,
+		chainConfig.DEPOSITOR_ADDRESS,
+		tokenId,
+	]);
+	console.log('burned shares: ', burnedShares);
 }
 
 main()
@@ -34,4 +41,3 @@ main()
 		console.error(error);
 		process.exit(1);
 	});
-
