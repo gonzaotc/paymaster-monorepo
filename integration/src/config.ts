@@ -29,6 +29,12 @@ export type ChainConfig = {
     //
     DEPLOYER_PRIVATE_KEY: Hex;
     DEPLOYER_ADDRESS: Address;
+    // 
+    DEPOSITOR_PRIVATE_KEY: Hex;
+    DEPOSITOR_ADDRESS: Address;
+    //
+    REBALANCER_PRIVATE_KEY: Hex;
+    REBALANCER_ADDRESS: Address;
     //
     RECIPIENT_ADDRESS: Address;
 }
@@ -58,6 +64,12 @@ export const chainConfig: Record<string, ChainConfig> = {
         DEPLOYER_PRIVATE_KEY: process.env.DEPLOYER_PRIVATE_KEY as unknown as Hex,
         DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS as unknown as Address,
         //
+        DEPOSITOR_PRIVATE_KEY: process.env.DEPOSITOR_PRIVATE_KEY as unknown as Hex,
+        DEPOSITOR_ADDRESS: process.env.DEPOSITOR_ADDRESS as unknown as Address,
+        //
+        REBALANCER_PRIVATE_KEY: process.env.REBALANCER_PRIVATE_KEY as unknown as Hex,
+        REBALANCER_ADDRESS: process.env.REBALANCER_ADDRESS as unknown as Address,
+        //
         RECIPIENT_ADDRESS: process.env.RECIPIENT_ADDRESS as unknown as Address,
     },
     mainnet: {
@@ -80,6 +92,12 @@ export const chainConfig: Record<string, ChainConfig> = {
         //
         DEPLOYER_PRIVATE_KEY: process.env.DEPLOYER_PRIVATE_KEY as unknown as Hex,
         DEPLOYER_ADDRESS: process.env.DEPLOYER_ADDRESS as unknown as Address,
+        //
+        DEPOSITOR_PRIVATE_KEY: process.env.DEPOSITOR_PRIVATE_KEY as unknown as Hex,
+        DEPOSITOR_ADDRESS: process.env.DEPOSITOR_ADDRESS as unknown as Address,
+        //
+        REBALANCER_PRIVATE_KEY: process.env.REBALANCER_PRIVATE_KEY as unknown as Hex,
+        REBALANCER_ADDRESS: process.env.REBALANCER_ADDRESS as unknown as Address,
         //
         RECIPIENT_ADDRESS: process.env.RECIPIENT_ADDRESS as unknown as Address,
     },
@@ -117,6 +135,10 @@ export const getChainConfig = (): [ChainConfig, Chain] => {
         USER_ADDRESS: 'USER_ADDRESS',
         DEPLOYER_PRIVATE_KEY: 'DEPLOYER_PRIVATE_KEY',
         DEPLOYER_ADDRESS: 'DEPLOYER_ADDRESS',
+        DEPOSITOR_PRIVATE_KEY: 'DEPOSITOR_PRIVATE_KEY',
+        DEPOSITOR_ADDRESS: 'DEPOSITOR_ADDRESS',
+        REBALANCER_PRIVATE_KEY: 'REBALANCER_PRIVATE_KEY',
+        REBALANCER_ADDRESS: 'REBALANCER_ADDRESS',
         RECIPIENT_ADDRESS: 'RECIPIENT_ADDRESS',
     };
     
