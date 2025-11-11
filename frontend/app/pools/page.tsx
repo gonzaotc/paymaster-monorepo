@@ -1,16 +1,14 @@
-import { AppHeader } from '@/components/app-header';
-import { PasskeyStatusPanel } from '@/components/passkey-status-panel';
 import { PoolSection } from '@/components/pool-section';
 
 const stats = [
-  { label: 'Network TVL', value: '$75.4M', change: '+12.1% vs last week' },
+  { label: 'TVL', value: '$120.4K', change: '+12.1% vs last week' },
   { label: 'Avg. APR', value: '5.8%', change: 'Blended across active pools' },
   {
     label: 'Daily Volume',
-    value: '$14.2M',
+    value: '$14.2K',
     change: 'Across 42 supported assets',
   },
-  { label: 'Rebalances', value: '278', change: 'Automations in the last 24h' },
+  { label: 'Txs Sponsored', value: '2784', change: 'In the last 24h' },
 ];
 
 const panelClass =
@@ -41,20 +39,16 @@ const poolActions = [
 ];
 
 export default function PoolPage() {
-  const privyEnabled = Boolean(process.env.NEXT_PUBLIC_PRIVY_APP_ID);
-
   return (
     <main className="min-h-screen">
       <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-8">
-        <AppHeader />
-
         <section className={`${panelClass} space-y-6`}>
           <div className="flex flex-col gap-2 text-center sm:text-left">
             <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
-              KPI overview
+              Status
             </p>
             <h2 className="text-2xl font-semibold text-slate-900">
-              Network pulse
+              Universal Paymaster
             </h2>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -72,23 +66,6 @@ export default function PoolPage() {
               </div>
             ))}
           </div>
-        </section>
-
-        <section className={`${panelClass} space-y-6`}>
-          <div className="flex flex-col gap-2 text-center sm:text-left">
-            <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
-              Authentication preview
-            </p>
-            <h2 className="text-2xl font-semibold text-slate-900">
-              Privy passkey login
-            </h2>
-            <p className="text-sm text-slate-600">
-              Use this standalone probe to confirm Privy SDK readiness, session
-              state, and the passkey challenge flow without wiring it into the
-              rest of the dashboard.
-            </p>
-          </div>
-          <PasskeyStatusPanel enabled={privyEnabled} />
         </section>
 
         <PoolSection actions={poolActions} />

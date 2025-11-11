@@ -2,6 +2,7 @@
 
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Preload } from '@react-three/drei';
+import { useRouter } from 'next/navigation';
 import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import {
   AdditiveBlending,
@@ -258,26 +259,45 @@ const GlobeScene = () => {
   );
 };
 
-export const GlobeCanvas = () => (
-  <div className="relative flex w-full max-w-[720px] flex-1 items-center justify-center">
-    <div className="aspect-square w-full">
-      <Canvas
-        camera={{ position: [0, 0, 3.2], fov: 45, near: 0.1, far: 100 }}
-        dpr={[1, 2]}
-        gl={{
-          antialias: true,
-          alpha: true,
-          powerPreference: 'high-performance',
-        }}>
-        <ambientLight intensity={0.45} />
-        <directionalLight position={[5, 3, 5]} intensity={1.2} />
-        <directionalLight position={[-5, -2, -3]} intensity={0.35} />
-        <GlobeScene />
-        <Preload all />
-      </Canvas>
+export const GlobeCanvas = () => {
+  const router = useRouter();
+
+  const handleNavigate = () => {
+    router.push('/pools');
+  };
+
+  return (
+    <div
+      className="relative flex w-full max-w-[720px] cursor-pointer flex-1 items-center justify-center"
+      role="button"
+      tabIndex={0}
+      aria-label="View pools"
+      onClick={handleNavigate}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleNavigate();
+        }
+      }}>
+      <div className="aspect-square w-full">
+        <Canvas
+          camera={{ position: [0, 0, 3.2], fov: 45, near: 0.1, far: 100 }}
+          dpr={[1, 2]}
+          gl={{
+            antialias: true,
+            alpha: true,
+            powerPreference: 'high-performance',
+          }}>
+          <ambientLight intensity={0.45} />
+          <directionalLight position={[5, 3, 5]} intensity={1.2} />
+          <directionalLight position={[-5, -2, -3]} intensity={0.35} />
+          <GlobeScene />
+          <Preload all />
+        </Canvas>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 const vertexShader = `
 precision highp float;
 
