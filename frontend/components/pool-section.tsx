@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { LiquidGlassButton } from '@/components/liquid-glass-button';
+import { LiquidGlassButton } from '@/components/ui/liquid-glass-button';
 import { PoolAnalyticsShell } from '@/components/pool-analytics-shell';
 import type { PoolRow } from '@/components/pool-table';
 

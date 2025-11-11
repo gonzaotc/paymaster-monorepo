@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { InfoBadge } from '@/components/info-badge';
+import { InfoBadge } from '@/components/ui/info-badge';
 
 export type PoolRow = {
   id: string;
