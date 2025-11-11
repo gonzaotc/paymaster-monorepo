@@ -2,6 +2,7 @@
 
 import { PrivyProvider } from '@privy-io/react-auth';
 import type { ReactNode } from 'react';
+import { ControlOrb } from '@/components/control-orb';
 
 type ProvidersProps = {
   children: ReactNode;
@@ -31,6 +32,7 @@ export function Providers({ children }: ProvidersProps) {
         },
       }}>
       {children}
+      <ControlOrb />
     </PrivyProvider>
   );
 }

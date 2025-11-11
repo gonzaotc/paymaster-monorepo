@@ -50,3 +50,24 @@ body {
   background: var(--accent);
   color: white;
 }
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) translateX(0px) rotate(0deg);
+  }
+  25% {
+    transform: translateY(-15px) translateX(8px) rotate(2deg);
+  }
+  50% {
+    transform: translateY(-8px) translateX(-8px) rotate(-2deg);
+  }
+  75% {
+    transform: translateY(-18px) translateX(4px) rotate(1deg);
+  }
+}
+
+/* ControlOrb animation utility classes */
+.animate-float {
+  animation: float 9s ease-in-out infinite;
+}
