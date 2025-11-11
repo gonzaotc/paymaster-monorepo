@@ -20,7 +20,7 @@ export type PoolRow = {
   tvl: string;
   apr: string;
   sevenDayVolume: string;
-  rebalanceFrequency: string;
+  rebalanceFactor: string;
 };
 
 export const defaultPoolData: PoolRow[] = [
@@ -29,50 +29,50 @@ export const defaultPoolData: PoolRow[] = [
     pool: 'ETH / USDC',
     tokens: ['ETH', 'USDC'],
     fee: '0.05%',
-    tvl: '$48.2M',
+    tvl: '$5.2K',
     apr: '5.1%',
-    sevenDayVolume: '$14.8M',
-    rebalanceFrequency: '2x / day',
+    sevenDayVolume: '$14.8K',
+    rebalanceFactor: '100%',
   },
   {
     id: 'eth-usdt',
     pool: 'ETH / USDT',
     tokens: ['ETH', 'USDT'],
     fee: '0.04%',
-    tvl: '$35.4M',
+    tvl: '$35.4K',
     apr: '4.7%',
-    sevenDayVolume: '$10.2M',
-    rebalanceFrequency: 'daily',
+    sevenDayVolume: '$10.2K',
+    rebalanceFactor: '99.8%',
   },
   {
     id: 'eth-dai',
     pool: 'ETH / DAI',
     tokens: ['ETH', 'DAI'],
     fee: '0.03%',
-    tvl: '$21.9M',
+    tvl: '$21.9K',
     apr: '4.9%',
-    sevenDayVolume: '$6.5M',
-    rebalanceFrequency: 'daily',
+    sevenDayVolume: '$6.5K',
+    rebalanceFactor: '99.5%',
   },
   {
     id: 'eth-wbtc',
     pool: 'ETH / WBTC',
     tokens: ['ETH', 'WBTC'],
     fee: '0.07%',
-    tvl: '$18.1M',
+    tvl: '$18.1K',
     apr: '6.2%',
-    sevenDayVolume: '$7.9M',
-    rebalanceFrequency: 'hourly',
+    sevenDayVolume: '$7.9K',
+    rebalanceFactor: '99.2%',
   },
   {
-    id: 'eth-arb',
-    pool: 'ETH / ARB',
-    tokens: ['ETH', 'ARB'],
+    id: 'eth-uni',
+    pool: 'ETH / UNI',
+    tokens: ['ETH', 'UNI'],
     fee: '0.15%',
-    tvl: '$12.3M',
+    tvl: '$12.3K',
     apr: '7.4%',
-    sevenDayVolume: '$5.1M',
-    rebalanceFrequency: '2x / day',
+    sevenDayVolume: '$5.1K',
+    rebalanceFactor: '98.9%',
   },
   {
     id: 'eth-op',
@@ -81,8 +81,8 @@ export const defaultPoolData: PoolRow[] = [
     fee: '0.12%',
     tvl: '$9.7M',
     apr: '6.9%',
-    sevenDayVolume: '$4.4M',
-    rebalanceFrequency: 'hourly',
+    sevenDayVolume: '$4.4K',
+    rebalanceFactor: '98.6%',
   },
 ];
 
@@ -180,7 +180,7 @@ const columns: ColumnDef<PoolRow>[] = [
     sortingFn: 'text',
   },
   {
-    header: () => makeHeader('TVL', 'X (ETH), Y (paired token)'),
+    header: () => makeHeader('TVL', 'X (ETH) + Y (paired token) in USD'),
     accessorKey: 'tvl',
     sortingFn: (rowA, rowB, columnId) => {
       return (
@@ -190,7 +190,7 @@ const columns: ColumnDef<PoolRow>[] = [
     },
   },
   {
-    header: () => makeHeader('APR'),
+    header: () => makeHeader('APR', 'Annualized percentage return'),
     accessorKey: 'apr',
     sortingFn: (rowA, rowB, columnId) => {
       return (
@@ -200,7 +200,7 @@ const columns: ColumnDef<PoolRow>[] = [
     },
   },
   {
-    header: () => makeHeader('7D Vol'),
+    header: () => makeHeader('7D Vol', '7-day sponsorship volume in USD'),
     accessorKey: 'sevenDayVolume',
     sortingFn: (rowA, rowB, columnId) => {
       return (
@@ -211,8 +211,8 @@ const columns: ColumnDef<PoolRow>[] = [
   },
   {
     header: () =>
-      makeHeader('Rebalance F', 'How often the pool needs to be rebalanced.'),
-    accessorKey: 'rebalanceFrequency',
+      makeHeader('Balance Factor', 'How balanced is the pool between ETH and the paired token.'),
+    accessorKey: 'rebalanceFactor',
     enableSorting: false,
   },
 ];

@@ -16,7 +16,7 @@ export function PoolSection({ actions, data }: PoolSectionProps) {
   return (
     <section className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
+        <p className="ml-1 text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
           Pools
         </p>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-end">

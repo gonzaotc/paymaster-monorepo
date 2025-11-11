@@ -153,7 +153,7 @@ export function PoolAnalyticsShell({
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
-                  Selected pool
+                  Pool
                 </p>
                 <h3 className="text-2xl font-semibold text-slate-900">
                   {selectedPool?.pool ?? 'No pool'}
@@ -196,10 +196,26 @@ export function PoolAnalyticsShell({
                   </div>
                   <div>
                     <dt className="text-xs uppercase tracking-[0.3em] text-slate-400">
-                      Rebalance
+                      Rebalance Factor
                     </dt>
                     <dd className="text-lg font-semibold text-slate-900">
-                      {selectedPool.rebalanceFrequency}
+                      {selectedPool.rebalanceFactor}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                      LPFee
+                    </dt>
+                    <dd className="text-lg font-semibold text-slate-900">
+                      {selectedPool.fee}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                      Rebalancing Fee
+                    </dt>
+                    <dd className="text-lg font-semibold text-slate-900">
+                    0.5%
                     </dd>
                   </div>
                 </dl>
