@@ -87,7 +87,8 @@ async function main() {
 	const paymasterData = paymaster.buildPaymasterData({
 		token: chainConfig.USDC,
 	});
-	console.log('built paymaster data');
+	console.log('built paymaster data', paymasterData);
+	console.log('paymaster data length (bytes):', paymasterData.length / 2 - 1); // -1 for '0x'
 
 	console.log('sending user operation');
 	const hash = await bundlerClient.sendUserOperation({
