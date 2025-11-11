@@ -26,7 +26,6 @@ type PaymasterToken = {
   name: string;
   network: string;
   feeRate: number;
-  liquidity: string;
 };
 
 const assetOptions: AssetOption[] = [
@@ -34,7 +33,7 @@ const assetOptions: AssetOption[] = [
     symbol: 'USDC',
     name: 'USD Coin',
     network: 'Ethereum Mainnet',
-    balance: 48250.78,
+    balance: 180.78,
   },
   {
     symbol: 'WETH',
@@ -46,31 +45,28 @@ const assetOptions: AssetOption[] = [
     symbol: 'DAI',
     name: 'MakerDAO DAI',
     network: 'Ethereum Mainnet',
-    balance: 1570.13,
+    balance: 170.13,
   },
 ];
 
 const paymasterTokens: PaymasterToken[] = [
   {
-    symbol: 'ETH',
-    name: 'Ether',
+    symbol: 'DAI',
+    name: 'MakerDAO DAI',
     network: 'Ethereum Mainnet',
-    feeRate: 0.002,
-    liquidity: 'Deep',
+    feeRate: 0.0015,
   },
   {
     symbol: 'USDC',
     name: 'USD Coin',
     network: 'Ethereum Mainnet',
     feeRate: 0.0015,
-    liquidity: 'Programmatic',
   },
   {
     symbol: 'OP',
     name: 'Optimism',
     network: 'Ethereum Mainnet',
     feeRate: 0.0035,
-    liquidity: 'Pool-backed',
   },
 ];
 
@@ -128,7 +124,7 @@ export function TransferForm() {
   );
 
   const amountNumber = Number(formState.amount) || 0;
-  const estimatedFee = amountNumber * selectedPaymaster.feeRate;
+  const estimatedFee = 12 * selectedPaymaster.feeRate;
   const canSubmit =
     Boolean(formState.recipient.trim()) &&
     amountNumber > 0 &&
@@ -279,7 +275,7 @@ export function TransferForm() {
         aria-busy={interactionLocked}>
         <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <div className="flex flex-col gap-5">
-            <Card kicker="Source asset" className="lg:col-span-2">
+            <Card kicker="SENDING" className="lg:col-span-2">
               <div className="grid gap-3 sm:grid-cols-2">
                 <LabeledField label="Asset">
                   <Select
@@ -343,7 +339,7 @@ export function TransferForm() {
 
             <Card kicker="Destination">
               <div className="space-y-3">
-                <LabeledField label="Recipient address">
+                <LabeledField label="Recipient">
                   <Input
                     type="text"
                     value={formState.recipient}
@@ -392,10 +388,6 @@ export function TransferForm() {
                             selectedPaymaster.symbol
                           }`
                         : '—'}
-                    </p>
-                    <p className="text-xs text-slate-500">
-                      {formatter.format(selectedPaymaster.feeRate * 100)}% of
-                      the transfer amount
                     </p>
                   </div>
                 </LabeledField>
