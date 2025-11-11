@@ -193,6 +193,9 @@ contract UniversalPaymasterTest is Test, UserOpHelper, TestingUtils {
             uint128(gasConfig.paymasterPostOpGasLimit), // post-op gas limit
             address(token)
         );
+        console.log("paymaster data: ");
+        console.logBytes(paymasterData);
+        console.log("paymaster data length (bytes):", paymasterData.length / 2 - 1); // -1 for '0x'
 
         // 4. Build calldata, where account sends 1 token to receiver
         bytes memory callData = abi.encodeWithSelector(

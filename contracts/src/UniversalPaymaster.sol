@@ -64,6 +64,9 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
     // thrown when not enough eth is sent
     error NotEnoughEthSent(uint256 ethSent, uint256 ethRequired);
 
+    // thrown when an invalid amount is provided
+    error InvalidAmount(uint256 amount);
+
     // mapping of token to oracle
     mapping(address token => Pool pool) public pools;
 
@@ -196,6 +199,8 @@ contract UniversalPaymaster is MinimalPaymasterCore, ERC6909NativeEntryPointVaul
         payable
         returns (uint256 ethAmountAfterDiscount)
     {
+        require(tokenAmount > 0, InvalidAmount(tokenAmount));
+        
         // 1. get the oracle and validate the pool exists
         Pool memory pool = pools[token];
         require(pool.oracle != address(0), PoolNotInitialized(token));

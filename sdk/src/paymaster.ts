@@ -1,5 +1,6 @@
 import { encodeAbiParameters } from 'viem';
 import type { Address, Hex } from 'viem';
+
 export type PaymasterData = {
 	token: Address;
 };
