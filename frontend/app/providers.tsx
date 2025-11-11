@@ -3,12 +3,14 @@
 import { PrivyProvider } from '@privy-io/react-auth';
 import type { ReactNode } from 'react';
 import { ControlOrb } from '@/components/control-orb';
+import { usePathname } from 'next/navigation';
 
 type ProvidersProps = {
   children: ReactNode;
 };
 
 export function Providers({ children }: ProvidersProps) {
+  const pathname = usePathname();
   const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
 
   if (!privyAppId) {
@@ -32,7 +34,8 @@ export function Providers({ children }: ProvidersProps) {
         },
       }}>
       {children}
-      <ControlOrb />
+
+      {pathname != '/' && <ControlOrb />}
     </PrivyProvider>
   );
 }
