@@ -8,22 +8,25 @@ import { getChainConfig } from '../src/config';
  * Deploy the UniversalPaymaster contract to the selected chain
  */
 async function main() {
-    const [deployer] = await hre.viem.getWalletClients();
-    const [chainConfig, ] = getChainConfig();
-    const publicClient = await hre.viem.getPublicClient();
+	const [deployer] = await hre.viem.getWalletClients();
+	const [chainConfig] = getChainConfig();
+	const publicClient = await hre.viem.getPublicClient();
 
-    const paymasterContract = getContract({
-        address: chainConfig.PAYMASTER,
-        abi: universalPaymasterAbi,
-        client: { public: publicClient, wallet: deployer },
-    });
+	const paymasterContract = getContract({
+		address: chainConfig.PAYMASTER,
+		abi: universalPaymasterAbi,
+		client: { public: publicClient, wallet: deployer },
+	});
 
-    const tokenId = BigInt(chainConfig.USDC);
-    console.log('tokenId: ', tokenId);
+	const tokenId = BigInt(chainConfig.USDC);
+	console.log('tokenId: ', tokenId);
 
-    const depositAmount = parseEther('0.1');
-    const mintedShares = await paymasterContract.write.deposit([depositAmount, chainConfig.DEPOSITOR_ADDRESS, tokenId], { value: depositAmount });
-    console.log('minted shares: ', mintedShares);
+	const depositAmount = parseEther('0.1');
+	const mintedShares = await paymasterContract.write.deposit(
+		[depositAmount, chainConfig.DEPOSITOR_ADDRESS, tokenId],
+		{ value: depositAmount }
+	);
+	console.log('minted shares: ', mintedShares);
 }
 
 main()
@@ -32,4 +35,3 @@ main()
 		console.error(error);
 		process.exit(1);
 	});
-

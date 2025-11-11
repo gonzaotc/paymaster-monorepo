@@ -1,7 +1,19 @@
 import { getChainConfig } from '../src/config';
-import { BundlerClient, createBundlerClient, toSimple7702SmartAccount } from 'viem/account-abstraction';
+import {
+	BundlerClient,
+	createBundlerClient,
+	toSimple7702SmartAccount,
+} from 'viem/account-abstraction';
 import { privateKeyToAccount } from 'viem/accounts';
-import { createClient, publicActions, walletActions, http, erc20Abi, parseUnits, type Call } from 'viem';
+import {
+	createClient,
+	publicActions,
+	walletActions,
+	http,
+	erc20Abi,
+	parseUnits,
+	type Call,
+} from 'viem';
 
 /**
  * Convert the EOA into a Simple Smart Account via EIP-7702 signatures.
@@ -11,54 +23,54 @@ import { createClient, publicActions, walletActions, http, erc20Abi, parseUnits,
 async function main() {
 	const [chainConfig, chain] = getChainConfig();
 
-    const USDC_TRANSFER_AMOUNT = parseUnits('1', 6); // 1 USDC
+	const USDC_TRANSFER_AMOUNT = parseUnits('1', 6); // 1 USDC
 
-    const eoa = privateKeyToAccount(chainConfig.USER_PRIVATE_KEY);
-    console.log('created eoa:');
+	const eoa = privateKeyToAccount(chainConfig.USER_PRIVATE_KEY);
+	console.log('generated eoa');
 
-    const client = createClient({
-        account: eoa,
-        chain,
-        transport: http(),
-    })
-        .extend(publicActions)
-        .extend(walletActions);
-    console.log('created client');
+	const client = createClient({
+		account: eoa,
+		chain,
+		transport: http(),
+	})
+		.extend(publicActions)
+		.extend(walletActions);
+	console.log('generated client');
 
-    const account = await toSimple7702SmartAccount({
-        client,
-        owner: eoa,
-    });
-    console.log('created account');
+	const account = await toSimple7702SmartAccount({
+		client,
+		owner: eoa,
+	});
+	console.log('generated account');
 
-    const code = await client.getCode({ address: eoa.address });
-    console.log('eoa code', code);
-    const isDelegated = code !== undefined && code.startsWith('0xef0100');
-    
-    let authorization;
-    if (isDelegated) {
-        console.log('account already delegated via EIP-7702, skipping authorization');
-        authorization = undefined;
-    } else {
-        console.log('account not yet delegated, creating authorization');
-        authorization = await client.signAuthorization(account.authorization);
-        console.log('created authorization');
-    }
+	const code = await client.getCode({ address: eoa.address });
+	console.log('eoa code', code);
+	const isDelegated = code !== undefined && code.startsWith('0xef0100');
 
-    const bundlerClient: BundlerClient = createBundlerClient({
-        account,
-        client,
-        transport: http(chainConfig.BUNDLER_URL),
-    });
-    console.log('created bundler client');
+	let authorization;
+	if (isDelegated) {
+		console.log('account already delegated via EIP-7702, skipping authorization');
+		authorization = undefined;
+	} else {
+		console.log('account not yet delegated, creating authorization');
+		authorization = await client.signAuthorization(account.authorization);
+		console.log('generated authorization');
+	}
 
-    const tx: Call = {
-        to: chainConfig.USDC,
-        abi: erc20Abi,
-        functionName: 'transfer',
-        args: [chainConfig.RECIPIENT_ADDRESS, USDC_TRANSFER_AMOUNT], 
-    };
-    console.log('created tx');
+	const bundlerClient: BundlerClient = createBundlerClient({
+		account,
+		client,
+		transport: http(chainConfig.BUNDLER_URL),
+	});
+	console.log('generated bundler client');
+
+	const tx: Call = {
+		to: chainConfig.USDC,
+		abi: erc20Abi,
+		functionName: 'transfer',
+		args: [chainConfig.RECIPIENT_ADDRESS, USDC_TRANSFER_AMOUNT],
+	};
+	console.log('generated tx');
 
 	const hash = await bundlerClient.sendUserOperation({
 		account,
@@ -77,4 +89,3 @@ main()
 		console.error(error);
 		process.exit(1);
 	});
-
