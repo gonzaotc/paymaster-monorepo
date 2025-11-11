@@ -260,7 +260,7 @@ const GlobeScene = () => {
 
 export const GlobeCanvas = () => (
   <div className="relative flex w-full max-w-[720px] flex-1 items-center justify-center">
-    <div className="aspect-square w-full overflow-hidden rounded-full bg-slate-900/40 shadow-[0_30px_120px_rgba(15,23,42,0.65)]">
+    <div className="aspect-square w-full">
       <Canvas
         camera={{ position: [0, 0, 3.2], fov: 45, near: 0.1, far: 100 }}
         dpr={[1, 2]}
