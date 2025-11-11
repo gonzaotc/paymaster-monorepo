@@ -1,7 +1,6 @@
 import hre from 'hardhat';
 import { universalPaymasterAbi } from 'paymaster-sdk';
 import { getContract } from 'viem';
-import { parseEther } from 'viem';
 import { getChainConfig } from '../src/config';
 
 /**
@@ -21,9 +20,12 @@ async function main() {
     const tokenId = BigInt(chainConfig.USDC);
     console.log('tokenId: ', tokenId);
 
-    const depositAmount = parseEther('0.1');
-    const mintedShares = await paymasterContract.write.deposit([depositAmount, chainConfig.DEPOSITOR_ADDRESS, tokenId], { value: depositAmount });
-    console.log('minted shares: ', mintedShares);
+    const withdrawAmount = await paymasterContract.read.maxWithdraw([chainConfig.DEPOSITOR_ADDRESS, tokenId]);
+    console.log('max withdraw amount: ', withdrawAmount);
+
+    const burnedShares = await paymasterContract.write
+    .withdraw([withdrawAmount, chainConfig.DEPOSITOR_ADDRESS, chainConfig.DEPOSITOR_ADDRESS, tokenId]);
+    console.log('burned shares: ', burnedShares);
 }
 
 main()

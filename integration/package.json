@@ -17,6 +17,7 @@
     "deploy-oracle": "hardhat run scripts/deployOracle.ts",
     "create-pool": "hardhat run scripts/createPool.ts",
     "deposit": "hardhat run scripts/deposit.ts",
+    "withdraw": "hardhat run scripts/withdraw.ts",
     "query-pool": "hardhat run scripts/queryPool.ts",
     "send-user-op": "hardhat run scripts/sendUserOp.ts",
     "send-sponsored-user-op": "hardhat run scripts/sendSponsoredUserOp.ts"

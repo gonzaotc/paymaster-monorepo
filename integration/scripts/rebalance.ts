@@ -18,11 +18,9 @@ async function main() {
         client: { public: publicClient, wallet: deployer },
     });
 
-    const tokenId = BigInt(chainConfig.USDC);
-    console.log('tokenId: ', tokenId);
+    const rebalanceAmount = parseEther('0.1');
 
-    const depositAmount = parseEther('0.1');
-    const mintedShares = await paymasterContract.write.deposit([depositAmount, chainConfig.DEPOSITOR_ADDRESS, tokenId], { value: depositAmount });
+    const mintedShares = await paymasterContract.write.rebalance([chainConfig.USDC, rebalanceAmount, chainConfig.REBALANCER_ADDRESS], { value: rebalanceAmount });
     console.log('minted shares: ', mintedShares);
 }
 
