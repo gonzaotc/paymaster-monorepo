@@ -13,11 +13,10 @@ export default function TransferPage() {
               Send funds
             </p>
             <h2 className="text-2xl font-semibold text-slate-900">
-              Build a transfer instruction
+              Send funds using the Universal Paymaster
             </h2>
             <p className="text-sm text-slate-600">
-              Pick any supported asset, set the amount, and decide which token
-              will settle the paymaster bill.
+              Complete your transfer and decide the token to use to pay for the gas.
             </p>
           </div>
           <TransferForm />
