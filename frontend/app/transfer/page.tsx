@@ -6,7 +6,7 @@ const panelClass =
 export default function TransferPage() {
   return (
     <div className="flex w-full flex-1 h-full">
-      <section className={`${panelClass} w-full space-y-18`}>
+      <section className={`${panelClass} w-full space-y-10`}>
         <div className="space-y-1 text-center sm:text-left">
           <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
             TRANSFER
