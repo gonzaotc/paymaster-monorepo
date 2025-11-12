@@ -28,6 +28,8 @@ const tokenIcons: Record<string, { src: string; alt: string }> = {
   BTC: { src: '/svg/bitcoin.svg', alt: 'Bitcoin' },
   UNI: { src: '/svg/uniswap.svg', alt: 'Uniswap' },
   OP: { src: '/svg/optimism.svg', alt: 'Optimism' },
+  ARB: { src: '/svg/arbitrum.svg', alt: 'Arbitrum' },
+  LINK: { src: '/svg/chainlink.svg', alt: 'Chainlink' },
 };
 
 const tokenBaseStyle = {

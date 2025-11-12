@@ -35,7 +35,7 @@ export function PoolSection({ actions, data }: PoolSectionProps) {
           </LiquidGlassButton>
         </div>
       </div>
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="min-h-0 flex-1 ">
         <PoolAnalyticsShell actions={actions} data={data} searchQuery={query} />
       </div>
     </section>

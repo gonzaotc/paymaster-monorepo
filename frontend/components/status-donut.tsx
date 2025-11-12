@@ -79,8 +79,43 @@ export function StatusDonut({ data, totalValue }: StatusDonutProps) {
   return (
     <div
       ref={containerRef}
-      className="relative flex w-full max-w-[16rem] aspect-square items-center justify-center">
+      className="reveal relative flex w-full max-w-[16rem] aspect-square items-center justify-center">
       <svg viewBox="-110 -110 220 220" className="h-full w-full text-slate-200">
+        <defs>
+          {arcData.map((segment, index) => (
+            <linearGradient
+              key={`gradient-${segment.data.id}`}
+              id={`donut-gradient-${index}`}
+              x1="0%"
+              y1="0%"
+              x2="100%"
+              y2="100%">
+              <stop
+                offset="0%"
+                stopColor={segment.data.color}
+                stopOpacity={0.45}
+              />
+              <stop
+                offset="55%"
+                stopColor={segment.data.color}
+                stopOpacity={0.85}
+              />
+              <stop
+                offset="100%"
+                stopColor={segment.data.color}
+                stopOpacity={1}
+              />
+            </linearGradient>
+          ))}
+          <filter id="donut-glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feDropShadow
+              dx="0"
+              dy="0"
+              stdDeviation="3"
+              floodColor="rgba(255,255,255,0.45)"
+            />
+          </filter>
+        </defs>
         <circle
           cx="0"
           cy="0"
@@ -88,6 +123,16 @@ export function StatusDonut({ data, totalValue }: StatusDonutProps) {
           fill="none"
           stroke="rgba(255,255,255,0.3)"
           strokeWidth="18"
+        />
+        <circle
+          cx="0"
+          cy="0"
+          r="85"
+          fill="none"
+          stroke="rgba(255,255,255,0.18)"
+          strokeDasharray="2 12"
+          strokeWidth="1.2"
+          className="donut-ticks"
         />
         {arcData.map((segment, index) => {
           const isHighlighted = highlightId === segment.data.id;
@@ -98,14 +143,14 @@ export function StatusDonut({ data, totalValue }: StatusDonutProps) {
               <path
                 pathLength={100}
                 d={path}
-                fill={
-                  isHighlighted
-                    ? segment.data.color.replace(/0\.9|0\.85/, '1')
-                    : segment.data.color
-                }
+                fill={`url(#donut-gradient-${index})`}
                 stroke="rgba(255,255,255,0.65)"
                 strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                shapeRendering="geometricPrecision"
                 className="donut-segment"
+                filter={isHighlighted ? 'url(#donut-glow)' : 'none'}
                 onMouseEnter={() => {
                   setHighlightId(segment.data.id);
                   if (!containerRef.current) {
@@ -144,7 +189,7 @@ export function StatusDonut({ data, totalValue }: StatusDonutProps) {
           <p className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
             Total TVL
           </p>
-          <p className="text-lg font-semibold text-slate-900 tabular-nums">
+          <p className="text-lg font-medium text-slate-900 tabular-nums">
             {formatCompactCurrency(computedTotal)}
           </p>
         </div>
