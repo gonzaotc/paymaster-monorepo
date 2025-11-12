@@ -89,13 +89,14 @@ export function StatusDonut({ data, totalValue }: StatusDonutProps) {
           stroke="rgba(255,255,255,0.3)"
           strokeWidth="18"
         />
-        {arcData.map((segment) => {
+        {arcData.map((segment, index) => {
           const isHighlighted = highlightId === segment.data.id;
           const path = arcGenerator(segment);
           const centroid = arcGenerator.centroid(segment);
           return path ? (
             <g key={segment.data.id}>
               <path
+                pathLength={100}
                 d={path}
                 fill={
                   isHighlighted
@@ -104,6 +105,7 @@ export function StatusDonut({ data, totalValue }: StatusDonutProps) {
                 }
                 stroke="rgba(255,255,255,0.65)"
                 strokeWidth="1.5"
+                className="donut-segment"
                 onMouseEnter={() => {
                   setHighlightId(segment.data.id);
                   if (!containerRef.current) {
@@ -129,6 +131,7 @@ export function StatusDonut({ data, totalValue }: StatusDonutProps) {
                   transformBox: 'fill-box',
                   transform: isHighlighted ? 'scale(1.05)' : 'scale(1)',
                   transition: 'transform 180ms ease-out, fill 180ms ease-out',
+                  animationDelay: `${index * 90}ms`,
                 }}
               />
             </g>
@@ -136,7 +139,7 @@ export function StatusDonut({ data, totalValue }: StatusDonutProps) {
         })}
       </svg>
 
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+      <div className="pointer-events-none absolute inset-0 flex items-center justify-center donut-center">
         <div className="rounded-full text-center shadow-[inset_0_2px_12px_rgba(255,255,255,0.6)] backdrop-blur">
           <p className="text-[0.6rem] font-semibold uppercase tracking-[0.3em] text-slate-500">
             Total TVL
