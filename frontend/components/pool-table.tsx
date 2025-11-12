@@ -197,7 +197,7 @@ export function PoolTable({
   });
 
   const containerClasses = [
-    'flex h-full w-full flex-col rounded-[2rem] border border-white/90 bg-white p-6 shadow-[0_25px_80px_rgba(15,23,42,0.025)]',
+    'flex h-full w-full flex-col rounded-[2rem] border border-white/90 bg-white p-6 shadow-[0_25px_80px_rgba(15,23,42,0.08)]',
     className,
   ]
     .filter(Boolean)
@@ -258,7 +258,7 @@ export function PoolTable({
           </thead>
 
           <tbody className="text-sm text-slate-700">
-            {table.getRowModel().rows.map((row) => (
+            {table.getRowModel().rows.map((row, index) => (
               <tr
                 key={row.id}
                 role={onSelectRow ? 'button' : undefined}
@@ -273,6 +273,7 @@ export function PoolTable({
                 }}
                 className={[
                   'border-b border-slate-100 last:border-0',
+                  'reveal',
                   onSelectRow
                     ? 'cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-200'
                     : '',
@@ -281,7 +282,8 @@ export function PoolTable({
                     : 'hover:bg-slate-50/80',
                 ]
                   .filter(Boolean)
-                  .join(' ')}>
+                  .join(' ')}
+                style={{ animationDelay: `${index * 70}ms` }}>
                 {row.getVisibleCells().map((cell) => (
                   <td
                     className="px-3 py-4 text-sm text-slate-600 sm:px-4"

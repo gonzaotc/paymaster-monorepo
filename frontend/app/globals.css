@@ -90,8 +90,22 @@ body {
     rgba(148, 163, 184, 0.4)
   );
   background-size: 250% auto;
+  background-clip: text;
   -webkit-background-clip: text;
   color: transparent;
   text-shadow: 0 2px 15px rgba(15, 23, 42, 0.18);
   animation: shimmer 7s ease-in-out infinite alternate;
+}
+
+@keyframes rowReveal {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.reveal {
+  animation: rowReveal 0.7s ease forwards;
 }

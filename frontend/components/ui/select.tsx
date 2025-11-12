@@ -7,9 +7,16 @@ type SelectProps = {
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
+  className?: string;
 };
 
-export function Select({ children, value, onChange, disabled }: SelectProps) {
+export function Select({
+  children,
+  value,
+  onChange,
+  disabled,
+  className,
+}: SelectProps) {
   return (
     <div className="relative">
       <select
@@ -17,9 +24,12 @@ export function Select({ children, value, onChange, disabled }: SelectProps) {
         onChange={(event) => onChange(event.target.value)}
         disabled={disabled}
         className={[
-          'h-10 w-full appearance-none rounded-[1.1rem] border border-white/90 bg-white/80 px-4 text-sm font-semibold text-slate-900 shadow-inner shadow-slate-100 focus:border-slate-200 focus:outline-none',
+          'h-11 w-full appearance-none rounded-[1.2rem] border border-white/35 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.9),rgba(255,255,255,0.45))] px-4 text-[0.95rem] font-medium text-slate-800/90 tracking-[0.01em] shadow-[inset_0_1px_0_rgba(255,255,255,0.65),0_8px_20px_rgba(10,16,40,0.12)] backdrop-blur-xl transition focus:border-indigo-200/50 focus:ring-2 focus:ring-indigo-100/60 focus:outline-none',
           'disabled:cursor-not-allowed disabled:opacity-60',
-        ].join(' ')}>
+          className,
+        ]
+          .filter(Boolean)
+          .join(' ')}>
         {children}
       </select>
       <span className="pointer-events-none absolute inset-y-0 right-4 flex items-center text-xs text-slate-500">

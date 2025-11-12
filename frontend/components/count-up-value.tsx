@@ -9,12 +9,9 @@ type CountUpValueProps = {
 
 const numberPattern = /([-+]?\d[\d,]*(?:\.\d+)?)/;
 
-export function CountUpValue({
-  value,
-  durationMs = 1200,
-}: CountUpValueProps) {
+export function CountUpValue({ value, durationMs = 1200 }: CountUpValueProps) {
   const [display, setDisplay] = useState(value);
-  const rafRef = useRef<number>();
+  const rafRef = useRef<number>(0);
 
   useEffect(() => {
     const match = value.match(numberPattern);
@@ -31,7 +28,7 @@ export function CountUpValue({
     const prefix = value.slice(0, match.index ?? 0);
     const suffix = value.slice((match.index ?? 0) + numericPart.length);
     const decimalDigits = numericPart.includes('.')
-      ? numericPart.split('.')[1]?.length ?? 0
+      ? (numericPart.split('.')[1]?.length ?? 0)
       : 0;
     const target = parseFloat(numericPart.replace(/,/g, ''));
 

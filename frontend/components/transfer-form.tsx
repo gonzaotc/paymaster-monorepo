@@ -13,6 +13,7 @@ import { Input } from '@/components/ui/input';
 import { LabeledField } from '@/components/ui/labeled-field';
 import { Select } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/spinner';
+import { LiquidGlassButton } from '@/components/ui/liquid-glass-button';
 
 type AssetOption = {
   symbol: string;
@@ -26,6 +27,11 @@ type PaymasterToken = {
   name: string;
   network: string;
   feeRate: number;
+};
+
+type NetworkOption = {
+  value: string;
+  label: string;
 };
 
 const assetOptions: AssetOption[] = [
@@ -70,11 +76,19 @@ const paymasterTokens: PaymasterToken[] = [
   },
 ];
 
+const networkOptions: NetworkOption[] = [
+  {
+    value: 'ethereum-mainnet',
+    label: 'Ethereum Mainnet',
+  },
+];
+
 type TransferFormState = {
   assetSymbol: string;
   amount: string;
   recipient: string;
   paymasterSymbol: string;
+  network: string;
 };
 
 type TransferStatus = 'idle' | 'loading' | 'success' | 'error';
@@ -92,10 +106,11 @@ const MOCK_ENS_DIRECTORY: Record<string, string> = {
 
 function createInitialFormState(): TransferFormState {
   return {
-    assetSymbol: assetOptions[0]?.symbol ?? '',
+    assetSymbol: '',
     amount: '',
     recipient: '',
-    paymasterSymbol: paymasterTokens[0]?.symbol ?? '',
+    paymasterSymbol: '',
+    network: '',
   };
 }
 
@@ -110,25 +125,29 @@ export function TransferForm() {
   );
 
   const selectedAsset = useMemo(
-    () =>
-      assetOptions.find((asset) => asset.symbol === formState.assetSymbol) ??
-      assetOptions[0],
+    () => assetOptions.find((asset) => asset.symbol === formState.assetSymbol),
     [formState.assetSymbol]
   );
   const selectedPaymaster = useMemo(
     () =>
       paymasterTokens.find(
         (token) => token.symbol === formState.paymasterSymbol
-      ) ?? paymasterTokens[0],
+      ),
     [formState.paymasterSymbol]
+  );
+  const selectedNetwork = useMemo(
+    () => networkOptions.find((network) => network.value === formState.network),
+    [formState.network]
   );
 
   const amountNumber = Number(formState.amount) || 0;
-  const estimatedFee = 12 * selectedPaymaster.feeRate;
+  const estimatedFee = selectedPaymaster ? 12 * selectedPaymaster.feeRate : 0;
   const canSubmit =
     Boolean(formState.recipient.trim()) &&
     amountNumber > 0 &&
-    Boolean(selectedAsset);
+    Boolean(selectedAsset) &&
+    Boolean(selectedPaymaster) &&
+    Boolean(formState.network);
 
   const interactionLocked = status !== 'idle';
   const buttonDisabled = interactionLocked || !canSubmit;
@@ -141,36 +160,16 @@ export function TransferForm() {
       case 'error':
         return 'Transfer failed';
       default:
-        return 'Send asset';
+        return 'Send';
     }
   })();
   const showButtonLabel = status === 'idle';
-  const shouldAnimateButton = status === 'success' || status === 'error';
-  const buttonFillTone =
+  const buttonTone =
     status === 'success'
-      ? 'bg-emerald-400'
+      ? 'positive'
       : status === 'error'
-        ? 'bg-rose-400'
-        : '';
-  const buttonToneClass = (() => {
-    switch (status) {
-      case 'loading':
-        return 'bg-gradient-to-r from-slate-900/90 via-slate-800 to-slate-900/90 border border-white/20 backdrop-blur';
-      case 'success':
-        return 'bg-gradient-to-r from-emerald-300 via-emerald-400 to-teal-300 border border-emerald-200/60';
-      case 'error':
-        return 'bg-gradient-to-r from-rose-300 via-rose-400 to-orange-300 border border-rose-200/60';
-      default:
-        return 'bg-slate-900';
-    }
-  })();
-  const showHalo = status !== 'idle';
-  const buttonHaloTone =
-    status === 'success'
-      ? 'shadow-[0_0_30px_10px_rgba(16,185,129,0.35)]'
-      : status === 'error'
-        ? 'shadow-[0_0_30px_10px_rgba(244,63,94,0.35)]'
-        : 'shadow-[0_0_35px_12px_rgba(148,163,184,0.25)]';
+        ? 'negative'
+        : 'default';
   const buttonMotionClass = status === 'loading' ? 'animate-button-pulse' : '';
   const buttonIcon = (() => {
     if (status === 'loading') {
@@ -184,6 +183,8 @@ export function TransferForm() {
     }
     return null;
   })();
+
+  const fieldSurfaceClass = 'border-white/30 bg-white/15';
 
   function handleFieldChange<T extends keyof TransferFormState>(
     field: T,
@@ -252,6 +253,7 @@ export function TransferForm() {
         amount: formState.amount,
         recipient: formState.recipient,
         paymaster: selectedPaymaster?.symbol ?? formState.paymasterSymbol,
+        network: formState.network,
       });
       setReceiptHash(result.hash);
       setStatus('success');
@@ -275,7 +277,10 @@ export function TransferForm() {
         aria-busy={interactionLocked}>
         <div className="grid gap-5 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">
           <div className="flex flex-col gap-5">
-            <Card kicker="SENDING" className="lg:col-span-2">
+            <Card
+              kicker="1. ASSET"
+              className="reveal relative lg:col-span-2 overflow-hidden border border-emerald-200/60 bg-gradient-to-br from-emerald-200/35 via-white/15 to-teal-100/20 shadow-[0_10px_30px_rgba(5,10,25,0.18)] backdrop-blur-3xl animate-gradient-shift"
+              kickerClassName="text-[10px] font-semibold uppercase tracking-[0.45em] text-emerald-500">
               <div className="grid gap-3 sm:grid-cols-2">
                 <LabeledField label="Asset">
                   <Select
@@ -283,19 +288,17 @@ export function TransferForm() {
                     onChange={(value) =>
                       handleFieldChange('assetSymbol', value)
                     }
-                    disabled={interactionLocked}>
+                    disabled={interactionLocked}
+                    className={fieldSurfaceClass}>
+                    <option value="" disabled>
+                      Select asset
+                    </option>
                     {assetOptions.map((asset) => (
                       <option key={asset.symbol} value={asset.symbol}>
                         {asset.symbol}
                       </option>
                     ))}
                   </Select>
-                  <p className="text-xs text-slate-500">
-                    Network:{' '}
-                    <span className="font-semibold text-slate-900">
-                      {selectedAsset?.network}
-                    </span>
-                  </p>
                 </LabeledField>
 
                 <LabeledField label="Amount">
@@ -310,35 +313,49 @@ export function TransferForm() {
                       }
                       placeholder="0.00"
                       disabled={interactionLocked}
+                      className={fieldSurfaceClass}
                     />
-                    <button
+                    <LiquidGlassButton
                       type="button"
                       onClick={handleMaxAmount}
                       disabled={interactionLocked}
-                      className={[
-                        'h-10 shrink-0 rounded-full border border-slate-200 px-3 text-xs font-semibold text-slate-700 transition sm:text-sm sm:px-4',
-                        interactionLocked
-                          ? 'cursor-not-allowed opacity-60'
-                          : 'hover:border-slate-300',
-                      ]
-                        .filter(Boolean)
-                        .join(' ')}>
+                      className="h-10 shrink-0 px-4 text-xs font-semibold sm:text-sm sm:px-5">
                       Max
-                    </button>
+                    </LiquidGlassButton>
                   </div>
-                  <p className="text-xs text-slate-500">
-                    Available:{' '}
-                    <span className="font-semibold text-slate-900">
-                      {formatBalance(selectedAsset?.balance ?? 0)}{' '}
-                      {selectedAsset?.symbol}
+                  <p className="ml-2 text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                    Available{' '}
+                    <span className="ml-1 text-[0.95rem] font-medium text-slate-800/90 tracking-[0.01em] normal-case">
+                      {selectedAsset
+                        ? `${formatBalance(selectedAsset.balance)} ${selectedAsset.symbol}`
+                        : '—'}
                     </span>
                   </p>
                 </LabeledField>
               </div>
             </Card>
 
-            <Card kicker="Destination">
-              <div className="space-y-3">
+            <Card
+              kicker="2. Destination"
+              className="reveal relative overflow-hidden border border-indigo-200/60 bg-linear-to-br from-indigo-200/35 via-white/15 to-slate-100/20 shadow-[0_10px_30px_rgba(5,10,25,0.16)] backdrop-blur-3xl animate-gradient-shift"
+              kickerClassName="text-[10px] font-semibold uppercase tracking-[0.45em] text-indigo-500">
+              <div className="grid gap-3 sm:grid-cols-2">
+                <LabeledField label="Network">
+                  <Select
+                    value={formState.network}
+                    onChange={(value) => handleFieldChange('network', value)}
+                    disabled={interactionLocked}
+                    className={fieldSurfaceClass}>
+                    <option value="" disabled>
+                      Select network
+                    </option>
+                    {networkOptions.map((network) => (
+                      <option key={network.value} value={network.value}>
+                        {network.label}
+                      </option>
+                    ))}
+                  </Select>
+                </LabeledField>
                 <LabeledField label="Recipient">
                   <Input
                     type="text"
@@ -348,7 +365,10 @@ export function TransferForm() {
                       handleFieldChange('recipient', nextValue);
                     }}
                     placeholder="0xA0CF...cE25"
-                    className="font-mono text-xs tracking-tight text-slate-900 sm:text-sm py-2"
+                    className={[
+                      'font-mono text-xs tracking-tight text-slate-900 sm:text-sm py-2',
+                      fieldSurfaceClass,
+                    ].join(' ')}
                     autoComplete="off"
                     spellCheck={false}
                     disabled={interactionLocked}
@@ -357,7 +377,10 @@ export function TransferForm() {
               </div>
             </Card>
 
-            <Card kicker="Paymaster funding">
+            <Card
+              kicker="3. Paymaster funding"
+              className="reveal relative overflow-hidden border border-amber-200/60 bg-linear-to-br from-amber-200/40 via-white/15 to-orange-100/20 shadow-[0_10px_30px_rgba(5,10,25,0.15)] backdrop-blur-3xl animate-gradient-shift"
+              kickerClassName="text-[10px] font-semibold uppercase tracking-[0.45em] text-amber-500">
               <div className="grid gap-3 sm:grid-cols-2">
                 <LabeledField
                   label={
@@ -371,7 +394,11 @@ export function TransferForm() {
                     onChange={(value) =>
                       handleFieldChange('paymasterSymbol', value)
                     }
-                    disabled={interactionLocked}>
+                    disabled={interactionLocked}
+                    className={fieldSurfaceClass}>
+                    <option value="" disabled>
+                      Select pay token
+                    </option>
                     {paymasterTokens.map((token) => (
                       <option key={token.symbol} value={token.symbol}>
                         {token.symbol}
@@ -381,15 +408,21 @@ export function TransferForm() {
                 </LabeledField>
 
                 <LabeledField label="Estimated fee">
-                  <div className="rounded-[1.25rem] border border-white/80 bg-white/90 px-4 py-3 shadow-inner shadow-slate-100">
-                    <p className="text-sm font-semibold text-slate-900">
-                      {estimatedFee > 0
-                        ? `${formatter.format(estimatedFee)} ${
-                            selectedPaymaster.symbol
-                          }`
-                        : '—'}
-                    </p>
-                  </div>
+                  <Input
+                    type="text"
+                    value={
+                      selectedPaymaster && estimatedFee > 0
+                        ? `${formatter.format(estimatedFee)} ${selectedPaymaster.symbol}`
+                        : '—'
+                    }
+                    readOnly
+                    disabled
+                    className={[
+                      fieldSurfaceClass,
+                      'text-sm',
+                      'disabled:opacity-100',
+                    ].join(' ')}
+                  />
                 </LabeledField>
               </div>
             </Card>
@@ -399,20 +432,26 @@ export function TransferForm() {
             <Card
               kicker="Transfer summary"
               title="Review before sending"
-              className="flex h-full flex-col"
-              bodyClassName="flex flex-1 flex-col justify-between gap-6">
-              <dl className="space-y-3 text-sm text-slate-600">
+              className="summary-card reveal relative flex h-full flex-col overflow-hidden rounded-4xl border border-white/25 px-5 pb-5 pt-6 text-slate-900 shadow-[0_12px_35px_rgba(15,23,42,0.12)]"
+              kickerClassName="text-[10px] font-semibold uppercase tracking-[0.45em] text-slate-500"
+              bodyClassName="flex flex-1 flex-col justify-between gap-6 text-slate-900"
+              unstyled>
+              <dl className="space-y-4 text-sm text-slate-700 mt-2">
                 <SummaryRow label="Asset">
-                  <span className="font-semibold text-slate-900">
-                    {selectedAsset?.symbol}
-                  </span>{' '}
-                  <span className="text-slate-500">
-                    ({selectedAsset?.network})
-                  </span>
+                  {selectedAsset ? selectedAsset.symbol : '—'}
+                </SummaryRow>
+                <SummaryRow label="Network">
+                  {selectedNetwork ? (
+                    <span className=" text-slate-900">
+                      {selectedNetwork.label}
+                    </span>
+                  ) : (
+                    '—'
+                  )}
                 </SummaryRow>
                 <SummaryRow label="Amount">
                   {formState.amount ? (
-                    <span className="font-semibold text-slate-900">
+                    <span className=" text-slate-900">
                       {formState.amount} {selectedAsset?.symbol}
                     </span>
                   ) : (
@@ -421,15 +460,15 @@ export function TransferForm() {
                 </SummaryRow>
                 <SummaryRow label="Recipient">
                   {formState.recipient ? (
-                    <span className="flex flex-col gap-0.5 font-semibold text-slate-900">
-                      <span className="font-semibold tracking-tight">
+                    <span className="flex flex-col gap-0.5  text-slate-900">
+                      <span className=" tracking-tight text-slate-900">
                         {truncateMiddle(
                           resolvedRecipient ?? formState.recipient
                         )}
                       </span>
                       {resolvedRecipient &&
                         resolvedRecipient !== formState.recipient && (
-                          <span className="text-[11px] text-end font-medium uppercase tracking-[0.2em] text-slate-400">
+                          <span className="text-[11px] text-end font-medium uppercase tracking-[0.2em] text-slate-500">
                             {formState.recipient}
                           </span>
                         )}
@@ -439,13 +478,11 @@ export function TransferForm() {
                   )}
                 </SummaryRow>
                 <SummaryRow label="Paymaster token">
-                  <span className="font-semibold text-slate-900">
-                    {selectedPaymaster?.symbol}
-                  </span>
+                  {selectedPaymaster ? selectedPaymaster.symbol : '—'}
                 </SummaryRow>
                 <SummaryRow label="Estimated fee">
                   {estimatedFee > 0 ? (
-                    <span className="font-semibold text-slate-900">
+                    <span className=" text-slate-900">
                       {formatter.format(estimatedFee)}{' '}
                       {selectedPaymaster?.symbol}
                     </span>
@@ -459,64 +496,118 @@ export function TransferForm() {
                       href={`${EXPLORER_BASE_URL}${receiptHash}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="font-mono text-xs text-slate-900 underline decoration-dotted underline-offset-4 hover:text-slate-600">
+                      className="font-mono text-xs text-slate-900 underline decoration-dotted underline-offset-4 hover:text-emerald-500">
                       {truncateMiddle(receiptHash)}
                     </a>
                   </SummaryRow>
                 )}
               </dl>
               <div className="space-y-3">
-                <button
+                <LiquidGlassButton
                   type="submit"
                   aria-label={buttonLabel}
                   disabled={buttonDisabled}
+                  tone={buttonTone}
                   className={[
-                    'relative inline-flex h-12 w-full items-center justify-center overflow-hidden rounded-full border text-sm font-semibold text-white shadow-[0_18px_45px_rgba(15,23,42,0.25)] transition focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-slate-900',
-                    buttonToneClass,
-                    showHalo ? buttonHaloTone : '',
+                    'flex h-12 w-full items-center justify-center gap-2 text-sm',
                     buttonMotionClass,
-                    !interactionLocked && canSubmit ? 'hover:bg-slate-800' : '',
-                    buttonDisabled ? 'cursor-not-allowed opacity-60' : '',
                     interactionLocked ? 'cursor-wait' : '',
                   ]
                     .filter(Boolean)
                     .join(' ')}>
-                  <span className="relative z-10 flex items-center gap-2">
-                    {buttonIcon}
-                    {showButtonLabel && <span>{buttonLabel}</span>}
-                  </span>
-                  <span
-                    className={[
-                      'absolute inset-0 origin-center scale-x-0 rounded-full opacity-90',
-                      shouldAnimateButton ? 'animate-button-fill' : '',
-                      buttonFillTone,
-                    ]
-                      .filter(Boolean)
-                      .join(' ')}
-                  />
-                </button>
+                  {buttonIcon}
+                  {showButtonLabel && <span>{buttonLabel}</span>}
+                </LiquidGlassButton>
               </div>
             </Card>
           </aside>
         </div>
       </form>
       <style jsx>{`
-        @keyframes button-fill-expand {
+        @keyframes gradient-shift {
           0% {
-            transform: scaleX(0);
-            opacity: 0.9;
+            background-position: 0% 50%;
           }
           50% {
-            transform: scaleX(1);
-            opacity: 0.85;
+            background-position: 100% 50%;
           }
           100% {
-            transform: scaleX(1);
-            opacity: 0;
+            background-position: 0% 50%;
           }
         }
-        .animate-button-fill {
-          animation: button-fill-expand 2s ease forwards;
+        .animate-gradient-shift {
+          animation: gradient-shift 12s ease-in-out infinite;
+          background-size: 220% 220%;
+        }
+        @keyframes summary-gradient {
+          0% {
+            background-position: 0% 50%;
+          }
+          50% {
+            background-position: 100% 50%;
+          }
+          100% {
+            background-position: 0% 50%;
+          }
+        }
+        :global(.summary-card) {
+          background-image:
+            linear-gradient(
+              135deg,
+              rgba(59, 130, 246, 0.18),
+              rgba(129, 140, 248, 0.16),
+              rgba(16, 185, 129, 0.15)
+            ),
+            radial-gradient(
+              circle at 20% 20%,
+              rgba(255, 255, 255, 0.08),
+              transparent 45%
+            );
+          background-size: 240% 240%;
+          animation: summary-gradient 22s ease-in-out infinite;
+          backdrop-filter: blur(26px);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.18),
+            0 12px 35px rgba(15, 23, 42, 0.18);
+        }
+        :global(.summary-card.reveal) {
+          animation:
+            summary-gradient 22s ease-in-out infinite,
+            rowReveal 0.7s ease forwards;
+        }
+        @keyframes summary-shine {
+          0% {
+            transform: translate3d(-20%, -20%, 0) rotate(20deg);
+            opacity: 0.15;
+          }
+          50% {
+            transform: translate3d(10%, 10%, 0) rotate(20deg);
+            opacity: 0.3;
+          }
+          100% {
+            transform: translate3d(-20%, -20%, 0) rotate(20deg);
+            opacity: 0.15;
+          }
+        }
+        :global(.summary-card)::after {
+          content: '';
+          position: absolute;
+          inset: 4px;
+          border-radius: inherit;
+          background: linear-gradient(
+            130deg,
+            rgba(255, 255, 255, 0.5) 0%,
+            rgba(255, 255, 255, 0.12) 45%,
+            transparent 75%
+          );
+          mix-blend-mode: screen;
+          pointer-events: none;
+          animation: summary-shine 12s ease-in-out infinite;
+          filter: blur(0.5px);
+        }
+        :global(.summary-card) > * {
+          position: relative;
+          z-index: 1;
         }
         @keyframes button-pulse {
           0% {
@@ -557,16 +648,28 @@ function truncateMiddle(value: string) {
 function SummaryRow({
   label,
   children,
+  tone = 'dark',
 }: {
   label: string;
   children: ReactNode;
+  tone?: 'dark' | 'light';
 }) {
+  const labelClass =
+    tone === 'light'
+      ? 'text-[10px] font-semibold uppercase tracking-[0.25em] text-white/70'
+      : 'text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-500';
+  const isDash = typeof children === 'string' && children.trim() === '—';
+  const baseValueClass = 'text-[0.95rem] font-medium tracking-[0.01em]';
+  const toneColorClass = tone === 'light' ? 'text-white' : 'text-slate-800/90';
+  const dashColorClass =
+    tone === 'light' ? 'text-white/70 text-xs' : 'text-slate-500';
+  const valueClass = [baseValueClass, isDash ? dashColorClass : toneColorClass]
+    .filter(Boolean)
+    .join(' ');
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-[10px] font-semibold uppercase tracking-[0.25em] text-slate-400">
-        {label}
-      </span>
-      <span className="text-sm font-medium text-slate-700">{children}</span>
+      <span className={labelClass}>{label}</span>
+      <span className={valueClass}>{children}</span>
     </div>
   );
 }
@@ -620,6 +723,7 @@ type SendTransferPayload = {
   amount: string;
   recipient: string;
   paymaster: string;
+  network: string;
 };
 
 async function sendTransfer(

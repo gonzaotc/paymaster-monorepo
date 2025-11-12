@@ -13,7 +13,7 @@ const sizeClasses: Record<NonNullable<SpinnerProps['size']>, string> = {
 };
 
 const toneClasses: Record<NonNullable<SpinnerProps['tone']>, string> = {
-  light: 'border-white/40 border-t-white border-l-white',
+  light: 'border-slate-400/40 border-t-white border-l-white',
   dark: 'border-slate-500/50 border-t-slate-800 border-l-slate-800',
 };
 

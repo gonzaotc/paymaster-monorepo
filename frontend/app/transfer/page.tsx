@@ -1,27 +1,28 @@
 import { TransferForm } from '@/components/transfer-form';
 
 const panelClass =
-  'rounded-[2rem] border border-white/80 bg-white/95 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.08)] backdrop-blur-2xl sm:p-8';
+  'rounded-[2rem] bg-white/95 p-6 shadow-[0_25px_80px_rgba(15,23,42,0.08)] sm:p-8';
 
 export default function TransferPage() {
   return (
-    <main className="min-h-screen">
-      <div className="mx-auto flex min-h-screen max-w-5xl flex-col gap-10 px-4 py-12 sm:px-6 lg:px-8">
-        <section className={`${panelClass} space-y-8`}>
-          <div className="space-y-2 text-center sm:text-left">
-            <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
-              Send funds
-            </p>
-            <h2 className="text-2xl font-semibold text-slate-900">
-              Send funds using the Universal Paymaster
-            </h2>
-            <p className="text-sm text-slate-600">
-              Complete your transfer and decide the token to use to pay for the gas.
-            </p>
-          </div>
-          <TransferForm />
-        </section>
-      </div>
-    </main>
+    <div className="flex w-full flex-1 h-full">
+      <section className={`${panelClass} w-full space-y-18`}>
+        <div className="space-y-1 text-center sm:text-left">
+          <p className="text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
+            TRANSFER
+          </p>
+          <h2 className="text-2xl mt-2 font-semibold text-slate-900">
+            Send funds using the{' '}
+            <span className="italic font-medium">Universal Paymaster</span>
+          </h2>
+          <p className="text-sm text-slate-600">
+            Complete your transfer and decide the token to use to pay for the
+            gas.
+          </p>
+        </div>
+
+        <TransferForm />
+      </section>
+    </div>
   );
 }
