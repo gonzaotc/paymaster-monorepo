@@ -132,10 +132,9 @@ export function PoolAnalyticsShell({
   const overlayVisible = isPanelMounted;
 
   return (
-    <div className="relative">
+    <div className="relative flex h-full flex-col">
       <PoolTable
         data={filteredData}
-        className="bg-white"
         onSelectRow={handleSelectRow}
         selectedPoolId={selectedPoolId}
       />
@@ -215,7 +214,7 @@ export function PoolAnalyticsShell({
                       Rebalancing Fee
                     </dt>
                     <dd className="text-lg font-semibold text-slate-900">
-                    0.5%
+                      0.5%
                     </dd>
                   </div>
                 </dl>

@@ -105,6 +105,9 @@ const tokenBaseStyle = {
   boxShadow: '0 10px 20px rgba(125, 139, 178, 0.35)',
 };
 
+const metricValueClass =
+  'text-[0.95rem] font-medium text-slate-800/80 tracking-[0.01em] tabular-nums';
+
 const makeHeader = (label: string, tooltip?: ReactNode) => (
   <span className="inline-flex items-center gap-1.5 leading-none">
     {label}
@@ -159,10 +162,13 @@ const columns: ColumnDef<PoolRow>[] = [
           string,
           string,
         ]);
+      const pairLabel = `${tokens[0]}/${tokens[1]}`;
       return (
         <div className="flex items-center gap-3">
           <TokenPair tokens={tokens} />
-          <span className="text-slate-900">{row.getValue('pool')}</span>
+          <span className="text-[0.68rem] font-semibold uppercase tracking-[0.32em] text-slate-500">
+            {pairLabel}
+          </span>
         </div>
       );
     },
@@ -178,10 +184,16 @@ const columns: ColumnDef<PoolRow>[] = [
       ),
     accessorKey: 'fee',
     sortingFn: 'text',
+    cell: ({ getValue }) => (
+      <span className={metricValueClass}>{getValue<string>()}</span>
+    ),
   },
   {
     header: () => makeHeader('TVL', 'X (ETH) + Y (paired token) in USD'),
     accessorKey: 'tvl',
+    cell: ({ getValue }) => (
+      <span className={metricValueClass}>{getValue<string>()}</span>
+    ),
     sortingFn: (rowA, rowB, columnId) => {
       return (
         parseCurrency(rowA.getValue(columnId)) -
@@ -192,6 +204,9 @@ const columns: ColumnDef<PoolRow>[] = [
   {
     header: () => makeHeader('APR', 'Annualized percentage return'),
     accessorKey: 'apr',
+    cell: ({ getValue }) => (
+      <span className={metricValueClass}>{getValue<string>()}</span>
+    ),
     sortingFn: (rowA, rowB, columnId) => {
       return (
         parsePercent(rowA.getValue(columnId)) -
@@ -202,6 +217,9 @@ const columns: ColumnDef<PoolRow>[] = [
   {
     header: () => makeHeader('7D Vol', '7-day sponsorship volume in USD'),
     accessorKey: 'sevenDayVolume',
+    cell: ({ getValue }) => (
+      <span className={metricValueClass}>{getValue<string>()}</span>
+    ),
     sortingFn: (rowA, rowB, columnId) => {
       return (
         parseCurrency(rowA.getValue(columnId)) -
@@ -211,9 +229,15 @@ const columns: ColumnDef<PoolRow>[] = [
   },
   {
     header: () =>
-      makeHeader('Balance Factor', 'How balanced is the pool between ETH and the paired token.'),
+      makeHeader(
+        'Balance Factor',
+        'How balanced is the pool between ETH and the paired token.'
+      ),
     accessorKey: 'rebalanceFactor',
     enableSorting: false,
+    cell: ({ getValue }) => (
+      <span className={metricValueClass}>{getValue<string>()}</span>
+    ),
   },
 ];
 
@@ -244,8 +268,7 @@ export function PoolTable({
   });
 
   const containerClasses = [
-    'w-full rounded-[2rem] border border-white/80 bg-white p-6 shadow-[0_25px_80px_rgba(76,99,237,0.1)] backdrop-blur-xl transition-shadow sm:p-8',
-    'hover:shadow-[0_30px_100px_rgba(76,99,237,0.16)]',
+    'flex h-full w-full flex-col rounded-[2rem] border border-white/90 bg-white p-6 shadow-[0_25px_80px_rgba(15,23,42,0.025)]',
     className,
   ]
     .filter(Boolean)
@@ -253,11 +276,15 @@ export function PoolTable({
 
   return (
     <div className={containerClasses}>
-      <div className="mb-6 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">
-        {caption}
-      </div>
+      {caption ? (
+        <div className="mb-6 text-sm font-semibold uppercase tracking-[0.3em] text-slate-500">
+          {caption}
+        </div>
+      ) : (
+        <div className="mb-2" />
+      )}
 
-      <div className="overflow-visible">
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <table className="w-full table-fixed border-collapse text-left">
           <colgroup>
             <col className="w-[28%]" />
@@ -328,7 +355,7 @@ export function PoolTable({
                   .join(' ')}>
                 {row.getVisibleCells().map((cell) => (
                   <td
-                    className="px-3 py-4 text-sm font-medium text-slate-700 sm:px-4"
+                    className="px-3 py-4 text-sm text-slate-600 sm:px-4"
                     key={cell.id}>
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                   </td>
