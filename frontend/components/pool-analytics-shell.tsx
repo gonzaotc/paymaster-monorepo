@@ -8,7 +8,8 @@ import {
   useState,
   useTransition,
 } from 'react';
-import { PoolRow, PoolTable, defaultPoolData } from '@/components/pool-table';
+import { PoolTable } from '@/components/pool-table';
+import { defaultPoolData, type PoolRow } from '@/data/pools';
 
 type PoolAction = {
   label: string;

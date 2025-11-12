@@ -11,80 +11,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { InfoBadge } from '@/components/ui/info-badge';
-
-export type PoolRow = {
-  id: string;
-  pool: string;
-  tokens?: [string, string];
-  fee: string;
-  tvl: string;
-  apr: string;
-  sevenDayVolume: string;
-  rebalanceFactor: string;
-};
-
-export const defaultPoolData: PoolRow[] = [
-  {
-    id: 'eth-usdc',
-    pool: 'ETH / USDC',
-    tokens: ['ETH', 'USDC'],
-    fee: '0.05%',
-    tvl: '$5.2K',
-    apr: '5.1%',
-    sevenDayVolume: '$14.8K',
-    rebalanceFactor: '100%',
-  },
-  {
-    id: 'eth-usdt',
-    pool: 'ETH / USDT',
-    tokens: ['ETH', 'USDT'],
-    fee: '0.04%',
-    tvl: '$35.4K',
-    apr: '4.7%',
-    sevenDayVolume: '$10.2K',
-    rebalanceFactor: '99.8%',
-  },
-  {
-    id: 'eth-dai',
-    pool: 'ETH / DAI',
-    tokens: ['ETH', 'DAI'],
-    fee: '0.03%',
-    tvl: '$21.9K',
-    apr: '4.9%',
-    sevenDayVolume: '$6.5K',
-    rebalanceFactor: '99.5%',
-  },
-  {
-    id: 'eth-wbtc',
-    pool: 'ETH / WBTC',
-    tokens: ['ETH', 'WBTC'],
-    fee: '0.07%',
-    tvl: '$18.1K',
-    apr: '6.2%',
-    sevenDayVolume: '$7.9K',
-    rebalanceFactor: '99.2%',
-  },
-  {
-    id: 'eth-uni',
-    pool: 'ETH / UNI',
-    tokens: ['ETH', 'UNI'],
-    fee: '0.15%',
-    tvl: '$12.3K',
-    apr: '7.4%',
-    sevenDayVolume: '$5.1K',
-    rebalanceFactor: '98.9%',
-  },
-  {
-    id: 'eth-op',
-    pool: 'ETH / OP',
-    tokens: ['ETH', 'OP'],
-    fee: '0.12%',
-    tvl: '$9.7M',
-    apr: '6.9%',
-    sevenDayVolume: '$4.4K',
-    rebalanceFactor: '98.6%',
-  },
-];
+import { defaultPoolData, type PoolRow } from '@/data/pools';
 
 const parseCurrency = (value: string) =>
   Number(value.replace(/[^0-9.]/g, '')) || 0;
@@ -99,6 +26,8 @@ const tokenIcons: Record<string, { src: string; alt: string }> = {
   DAI: { src: '/svg/dai.svg', alt: 'Dai' },
   WBTC: { src: '/svg/bitcoin.svg', alt: 'Wrapped Bitcoin' },
   BTC: { src: '/svg/bitcoin.svg', alt: 'Bitcoin' },
+  UNI: { src: '/svg/uniswap.svg', alt: 'Uniswap' },
+  OP: { src: '/svg/optimism.svg', alt: 'Optimism' },
 };
 
 const tokenBaseStyle = {
@@ -230,7 +159,7 @@ const columns: ColumnDef<PoolRow>[] = [
   {
     header: () =>
       makeHeader(
-        'Balance Factor',
+        'Balance ƒ',
         'How balanced is the pool between ETH and the paired token.'
       ),
     accessorKey: 'rebalanceFactor',

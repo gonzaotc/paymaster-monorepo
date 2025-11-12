@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { LiquidGlassButton } from '@/components/ui/liquid-glass-button';
 import { PoolAnalyticsShell } from '@/components/pool-analytics-shell';
-import type { PoolRow } from '@/components/pool-table';
+import type { PoolRow } from '@/data/pools';
 
 type PoolSectionProps = {
   actions: Parameters<typeof PoolAnalyticsShell>[0]['actions'];
