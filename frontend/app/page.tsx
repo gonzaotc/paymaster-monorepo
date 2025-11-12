@@ -3,10 +3,10 @@ import { GlobeCanvas } from '@/components/globe';
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen">
+    <main className="absolute inset-0 flex h-screen w-screen flex-col overflow-hidden">
       <AppHeader className="pointer-events-none absolute top-10 left-1/2 w-full -translate-x-1/2 px-4 text-slate-400" />
 
-      <div className="flex w-full h-full items-center justify-center pt-7">
+      <div className="flex h-full w-full items-center justify-center">
         <GlobeCanvas />
       </div>
     </main>

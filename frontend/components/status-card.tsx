@@ -1,5 +1,6 @@
 import { defaultPoolData, type PoolRow } from '@/data/pools';
 import { StatusDonut } from './status-donut';
+import { CountUpValue } from '@/components/count-up-value';
 
 type StatusCardProps = {
   stats: Array<{ label: string; value: string; change: string }>;
@@ -68,7 +69,7 @@ export function StatusCard({ stats, poolData }: StatusCardProps) {
                 {stat.label}
               </p>
               <p className="mt-2 text-2xl font-semibold text-slate-900">
-                {stat.value}
+                <CountUpValue value={stat.value} />
               </p>
             </div>
             <p className="text-xs text-slate-500">{stat.change}</p>

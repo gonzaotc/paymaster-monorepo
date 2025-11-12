@@ -16,7 +16,7 @@ export function PoolSection({ actions, data }: PoolSectionProps) {
   return (
     <section className="flex h-full flex-col gap-6">
       <div className="flex flex-col gap-4 shrink-0 sm:flex-row sm:items-center sm:justify-between">
-        <p className="ml-1 text-xs font-semibold uppercase tracking-[0.5em] text-slate-500">
+        <p className="ml-1 text-sm font-medium uppercase tracking-[0.5em] text-slate-500">
           Pools
         </p>
         <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
@@ -36,11 +36,7 @@ export function PoolSection({ actions, data }: PoolSectionProps) {
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-hidden">
-        <PoolAnalyticsShell
-          actions={actions}
-          data={data}
-          searchQuery={query}
-        />
+        <PoolAnalyticsShell actions={actions} data={data} searchQuery={query} />
       </div>
     </section>
   );
