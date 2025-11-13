@@ -12,27 +12,23 @@ import { env } from '@/config/env';
 import { universalPaymasterAbi } from '@/lib/abi/universalPaymaster';
 
 type CreatePoolParams = {
-  paymasterAddress: Address;
   token: Address;
   oracle: Address;
   lpFeeBps: number;
   rebalancingFeeBps: number;
 };
 type SupplyPoolParams = {
-  paymasterAddress: Address;
   token: Address;
   assetsWei: bigint;
   receiver: Address;
 };
 type WithdrawPoolParams = {
-  paymasterAddress: Address;
   token: Address;
   assetsWei: bigint;
   receiver: Address;
   owner: Address;
 };
 type RebalancePoolParams = {
-  paymasterAddress: Address;
   token: Address;
   tokenAmount: bigint;
   maxEthToSend: bigint; // msg.value >= ethAmountAfterDiscount
@@ -66,11 +62,12 @@ const writeContract = async (params: any) => {
 };
 const poolIdFromToken = (token: Address): bigint => BigInt(token);
 
+const paymasterAddress = env.paymasterAddress;
+
 /**  ------ ACTIONS ------ **/
 
 export async function createPool(params: CreatePoolParams) {
-  const { paymasterAddress, token, oracle, lpFeeBps, rebalancingFeeBps } =
-    params;
+  const { token, oracle, lpFeeBps, rebalancingFeeBps } = params;
 
   const { hash, receipt } = await writeContract({
     address: paymasterAddress,
@@ -83,7 +80,7 @@ export async function createPool(params: CreatePoolParams) {
 }
 
 export async function supplyToPool(params: SupplyPoolParams) {
-  const { paymasterAddress, token, assetsWei, receiver } = params;
+  const { token, assetsWei, receiver } = params;
 
   const id = poolIdFromToken(token);
   const { hash, receipt } = await writeContract({
@@ -98,7 +95,7 @@ export async function supplyToPool(params: SupplyPoolParams) {
 }
 
 export async function withdrawFromPool(params: WithdrawPoolParams) {
-  const { paymasterAddress, token, assetsWei, receiver, owner } = params;
+  const { token, assetsWei, receiver, owner } = params;
 
   const id = poolIdFromToken(token);
   const _receiver = receiver;
@@ -115,8 +112,7 @@ export async function withdrawFromPool(params: WithdrawPoolParams) {
 }
 
 export async function rebalancePool(params: RebalancePoolParams) {
-  const { paymasterAddress, token, tokenAmount, maxEthToSend, receiver } =
-    params;
+  const { token, tokenAmount, maxEthToSend, receiver } = params;
 
   const { hash, receipt } = await writeContract({
     address: paymasterAddress,
