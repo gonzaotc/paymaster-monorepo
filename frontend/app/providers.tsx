@@ -1,38 +1,51 @@
 'use client';
 
-import { PrivyProvider } from '@privy-io/react-auth';
-import type { ReactNode } from 'react';
-import { ControlOrb } from '@/components/control-orb';
 import { usePathname } from 'next/navigation';
+import { mainnet, sepolia } from 'viem/chains';
+import { useMemo, type ReactNode } from 'react';
+import { createPublicClient, http, type Chain } from 'viem';
+import { PrivyClientConfig, PrivyProvider } from '@privy-io/react-auth';
+
+import { env } from '@/config/env';
+import { ControlOrb } from '@/components/control-orb';
 
 type ProvidersProps = {
   children: ReactNode;
 };
 
+const resolveChain = (): Chain => {
+  const supportedChains: Chain[] = [mainnet, sepolia];
+  const numericId = Number(env.chainId);
+  return supportedChains.find((chain) => chain.id === numericId) ?? mainnet;
+};
+
+const resolveRpc = () => {
+  const fallbackUrl = mainnet.rpcUrls.default.http[0];
+  return http(env.rpcUrl ?? fallbackUrl);
+};
+
+export const client = createPublicClient({
+  chain: resolveChain(),
+  transport: resolveRpc(),
+});
+
 export function Providers({ children }: ProvidersProps) {
   const pathname = usePathname();
-  const privyAppId = process.env.NEXT_PUBLIC_PRIVY_APP_ID;
 
-  if (!privyAppId) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.warn(
-        'Privy is not initialized because NEXT_PUBLIC_PRIVY_APP_ID is missing.'
-      );
-    }
-    return children;
-  }
+  const privyConfig: PrivyClientConfig = useMemo(
+    () => ({
+      appearance: { theme: 'light' },
+      loginMethods: ['passkey', 'wallet', 'email'],
+      passkeys: {
+        shouldUnenrollMfaOnUnlink: true,
+        shouldUnlinkOnUnenrollMfa: true,
+      },
+    }),
+    []
+  );
 
   return (
-    <PrivyProvider
-      appId={privyAppId}
-      config={{
-        appearance: { theme: 'light' },
-        loginMethods: ['passkey', 'wallet', 'email'],
-        passkeys: {
-          shouldUnenrollMfaOnUnlink: true,
-          shouldUnlinkOnUnenrollMfa: true,
-        },
-      }}>
+    <PrivyProvider appId={env.privyAppId} config={privyConfig}>
       {children}
 
       {pathname != '/' && <ControlOrb />}
