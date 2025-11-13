@@ -9,6 +9,7 @@ import {
   useTransition,
 } from 'react';
 import { PoolTable } from '@/components/pool-table';
+import { LiquidGlassButton } from '@/components/ui/liquid-glass-button';
 import { defaultPoolData, type PoolRow } from '@/data/pools';
 
 type PoolAction = {
@@ -230,7 +231,7 @@ export function PoolAnalyticsShell({
 
                   {actions.map((action) => (
                     <div key={action.label} className="space-y-1">
-                      <form action={action.action} className="flex">
+                      <form action={action.action} className="flex w-full">
                         <input
                           type="hidden"
                           name="poolId"
@@ -241,16 +242,9 @@ export function PoolAnalyticsShell({
                           name="poolName"
                           value={selectedPool.pool}
                         />
-                        <button
-                          type="submit"
-                          className={[
-                            'w-full rounded-full px-5 py-3 text-sm font-semibold transition',
-                            action.variant === 'ghost'
-                              ? 'border border-slate-200/80 text-slate-600 hover:bg-slate-50'
-                              : 'bg-accent text-white shadow-lg shadow-[rgba(76,99,237,0.35)] hover:bg-indigo-500',
-                          ].join(' ')}>
+                        <LiquidGlassButton type="submit" className="w-full">
                           {action.label}
-                        </button>
+                        </LiquidGlassButton>
                       </form>
                       {action.description && (
                         <p className="text-xs text-slate-400">
@@ -259,6 +253,15 @@ export function PoolAnalyticsShell({
                       )}
                     </div>
                   ))}
+
+                  <div className="space-y-1">
+                    <LiquidGlassButton type="button" className="w-full">
+                      Rebalance
+                    </LiquidGlassButton>
+                    <p className="text-xs text-slate-400">
+                      Swap ETH for the pool’s paired token to refill reserves.
+                    </p>
+                  </div>
                 </div>
               </div>
             ) : (
