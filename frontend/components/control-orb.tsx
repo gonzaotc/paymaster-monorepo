@@ -95,7 +95,7 @@ export function ControlOrb({ options }: ControlOrbProps) {
   return (
     <div
       ref={containerRef}
-      className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-5 sm:gap-6">
+      className="fixed bottom-6 right-6 z-30 flex flex-col items-center gap-5 sm:gap-6">
       <div
         id={panelId}
         role="menu"
