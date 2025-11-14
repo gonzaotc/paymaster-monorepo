@@ -1,15 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { mainnet, sepolia } from 'viem/chains';
 import { useMemo, type ReactNode } from 'react';
-import {
-  createPublicClient,
-  createWalletClient,
-  custom,
-  http,
-  type Chain,
-} from 'viem';
 import { PrivyClientConfig, PrivyProvider } from '@privy-io/react-auth';
 
 import { env } from '@/config/env';
