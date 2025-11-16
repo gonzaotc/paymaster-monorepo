@@ -70,3 +70,5 @@ typechain-types/
 broadcast/
 !broadcast/.gitkeep
 
+# docs
+docs/
